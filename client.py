@@ -1,5 +1,12 @@
-from server import *
-import server
+# import server
+import random
+from socket import *
+from email import message
+import sys
+from threading import Thread
+import socket
+from time import sleep, time
+from cv2 import cv2
 import packet
 
 class Client:
