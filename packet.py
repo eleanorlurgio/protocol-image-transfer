@@ -3,8 +3,8 @@ class Packet:
     def __init__(self, sourcePort, destinationPort, seqNum, ackNum, ackBit, synBit, finBit, data):
         self.sourcePort = sourcePort
         self.destinationPort = destinationPort
-        self.header = str(self.sourcePort) + str(self.destinationPort) + str(seqNum) + str(ackNum) + str(ackBit) + str(synBit) + str(finBit)
-        # self.header = (self.sourcePort) + (self.destinationPort) + (seqNum) + (ackNum) + (ackBit) + (synBit) + (finBit)
+        # self.header = str(self.sourcePort) + str(self.destinationPort) + str(seqNum) + str(ackNum) + str(ackBit) + str(synBit) + str(finBit)
+        self.header = (self.sourcePort) + (self.destinationPort) + (seqNum) + (ackNum) + (ackBit) + (synBit) + (finBit)
         self.data = data
 
     def setHeader(self, seqNum, ackNum, ackBit, synBit, finBit):

@@ -9,6 +9,8 @@ from time import sleep, time
 from cv2 import cv2
 import packet
 
+BUFFER_SIZE = 1024000
+
 class Client:
 
 	def __init__(self, sourceIP, sourcePort):
