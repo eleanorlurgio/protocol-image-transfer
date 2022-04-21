@@ -3,8 +3,6 @@ class Packet:
     def __init__(self, sourcePort, destinationPort, seqNum, ackNum, ackBit, synBit, finBit,  windowSize, data):
         self.sourcePort = int(sourcePort)
         self.destinationPort = int(destinationPort)
-        # self.header = bytes(sourcePort) + bytes(destinationPort) + bytes(seqNum) + bytes(ackNum) + bytes(ackBit) + bytes(synBit) + bytes(finBit)
-        # self.header = str(sourcePort) + str(destinationPort) + str(seqNum) + str(ackNum) + str(ackBit) + str(synBit) + str(finBit)
         self.seqNum = int(seqNum)
         self.ackNum = int(ackNum)
         self.ackBit = bool(ackBit)
@@ -47,15 +45,15 @@ class Packet:
         return self.windowSize
 
     def toByteArray(self):
-        # print(self.packet)
+
         byteArray = bytearray()
-        byteArray[1:2] = self.sourcePort.to_bytes(2, byteorder='big')
-        byteArray[3:4] = self.destinationPort.to_bytes(2, byteorder='big')
-        byteArray[5:8] = self.seqNum.to_bytes(4, byteorder='big')
-        byteArray[9:12] = self.ackNum.to_bytes(4, byteorder='big')
-        byteArray[13:16] = self.ackBit.to_bytes(4, byteorder='big')
-        byteArray[17:20] = self.synBit.to_bytes(4, byteorder='big')
-        byteArray[21:24] = self.finBit.to_bytes(4, byteorder='big')
-        # self.sourcePort.to_bytes(2, byteorder='big') + self.destinationPort.to_bytes(2, byteorder='big') + self.seqNum.to_bytes(4, byteorder='big') + self.ackNum.to_bytes(4, byteorder='big') + self.synBit.to_bytes(4, byteorder='big') + self.finBit.to_bytes(4, byteorder='big')
-        # return bytes(bytes(self.synBit) + bytes(self.ackBit) + bytes(self.finBit) + bytes(self.seqNum) + bytes(self.ackNum) + bytes(self.windowSize) )
+
+        byteArray[1:2] = self.sourcePort.to_bytes(2, byteorder='big')   # Allocate 2 bytes
+        byteArray[3:4] = self.destinationPort.to_bytes(2, byteorder='big')  # Allocate 2 bytes
+        byteArray[5:8] = self.seqNum.to_bytes(4, byteorder='big')   # Allocate 4 bytes
+        byteArray[9:12] = self.ackNum.to_bytes(4, byteorder='big')   # Allocate 4 bytes
+        byteArray[13:16] = self.ackBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes
+        byteArray[17:20] = self.synBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes
+        byteArray[21:24] = self.finBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes
+
         return byteArray

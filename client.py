@@ -96,4 +96,18 @@ class Client:
 
 		# Receive packet with data
 
+	def createClient():
+		# Set the IP address and port number of the client
+		IP = "127.0.0.1"
+		port = int(input("Enter your port number: "))
+
+		# Create client instance
+		client = Client(IP, port)
+
+		# Start 3 way handshake procedure
+		client.initialiseConnection()
+
+# Initialise client with IP and port number
+Client.createClient()
+
 	
