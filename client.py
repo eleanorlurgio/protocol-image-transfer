@@ -38,7 +38,7 @@ class Client:
 
 		# Create a socket with a 1s timeout
 		clientSock = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-		clientSock.settimeout(1.0)
+		clientSock.settimeout(2.0)
 
 		# Send data to client
 		# print('Ping %d %s' % (1,Message.decode()))
@@ -54,7 +54,7 @@ class Client:
 
 			# Get the response & extract data
 			try:
-				data = clientSock.recvfrom(packet.getWindowSize())
+				serverPacket = clientSock.recvfrom(1024)
 			except TimeoutError:
 				print("timeout")
 				sleep(0.1)
@@ -65,10 +65,10 @@ class Client:
 				continue
 			break
 
-		img = data[0]
-		address = data[1]
+		# img = serverPacket[0]
+		# address = serverPacket[1]
 
-		print(str(data))
+		print(str(serverPacket))
 		# print('client received: ' + str(img))
 
 		# Close the socket
