@@ -41,8 +41,3 @@ class Server:
         
 server = Server()
 server.serverListen()
-
-# The connection is defined by a tuple (source IP, source port, destination IP, destination port)
-# def OpenConnection(username, source_IP, source_port, destination_IP, destination_port):
-#     Thread(target = ClientSend, args=(destination_IP, destination_port)).start()
-#     Thread(target = ClientReceive, args=(username, source_IP, source_port)).start()

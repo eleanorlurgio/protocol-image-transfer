@@ -28,7 +28,7 @@ class Client:
 		# Message = str.encode("request photo")
 
 		# Read image
-		my_img = cv2.imread("image_black.png", cv2.IMREAD_GRAYSCALE)
+		# my_img = cv2.imread("image_black.png", cv2.IMREAD_GRAYSCALE)
 		# packet.setData(my_img)
 		# print(my_img)
 		# cv2.imshow('My image', my_img)
@@ -66,7 +66,9 @@ class Client:
 
 		img = data[0]
 		address = data[1]
-		print('client received: ' + str(img))
+
+		print(str(data))
+		# print('client received: ' + str(img))
 
 		# Close the socket
 		print('closing socket')
@@ -75,7 +77,7 @@ class Client:
 
 	def initialiseConnection(self):
 		# Send packet 1
-		clientPacket = packet.Packet(self.sourcePort, 12501, 0, 0, 0, 0, 0, "hi")
+		clientPacket = packet.Packet(self.sourcePort, 12501, 1, 1, 0, 0, 0, "hi")
 		# print(clientPacket.header)
 
 		self.clientSend(clientPacket)
@@ -90,16 +92,4 @@ class Client:
 
 		# Receive packet with data
 
-	# if __name__ == '__main__':
-	# 	username = str(input("Enter your username: "))
-	# 	# Set IP address to local IP address
-	# 	# ip = socket.gethostbyname(socket.gethostname())
-	# 	print(socket.gethostbyname(socket.gethostname()))
-	# 	source_IP = "0.0.0.0" #socket.gethostbyname(socket.gethostname())
-	# 	source_port = 12500
-	# 	destination_IP = "localhost" #socket.gethostbyname(socket.gethostname())
-	# 	destination_port = 12501
-	# 	# port = int(input("Connect to which port number: "))
-	# 	# Thread(target = OpenConnection, args=(source_IP, source_port, destination_IP, destination_port)).start()
-	# 	OpenConnection(username, source_IP, source_port, destination_IP, destination_port)
-	# 	# Thread(target = OpenConnection, args=(client1_IP, client1_port, client2_IP, client2_port)).start()
+	
