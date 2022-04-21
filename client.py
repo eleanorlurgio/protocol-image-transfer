@@ -22,7 +22,7 @@ class Client:
 	def clientSend(self, packet):
 		# Create a UDP socket
 		UDP_IP_ADDRESS = self.sourceIP
-		UDP_PORT_NO = packet.destinationPort
+		UDP_PORT_NO = 8080
 
 		# Request message from user client
 		# Message = str.encode("request photo")
@@ -46,6 +46,7 @@ class Client:
 		while True:
 			# Send the message using the clientSock
 			# clientSock.sendto(Message, (UDP_IP_ADDRESS, UDP_PORT_NO))
+			# bytearray(packet.toByteArray(), 'utf-8')
 			clientSock.sendto(packet.toByteArray(), (UDP_IP_ADDRESS, UDP_PORT_NO))
 
 			# Receive response
@@ -53,7 +54,7 @@ class Client:
 
 			# Get the response & extract data
 			try:
-				data = clientSock.recvfrom(BUFFER_SIZE)
+				data = clientSock.recvfrom(packet.getWindowSize())
 			except TimeoutError:
 				print("timeout")
 				sleep(0.1)
@@ -76,10 +77,13 @@ class Client:
 
 
 	def initialiseConnection(self):
-		# Send packet 1
-		clientPacket = packet.Packet(self.sourcePort, 12501, 1, 1, 2, 3, 4, "hi")
-		# print(clientPacket.header)
+		# Send packet 1 (syn packet)
 
+		# 11FalseTrueFalse
+		clientPacket = packet.Packet(12500, 8080, 423894, 1, False, True, False, 1024, "hi")
+		# clientPacket.setSynBit(True)
+		# print(clientPacket.header)
+		
 		self.clientSend(clientPacket)
 
 		# Receive packet 2
