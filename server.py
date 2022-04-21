@@ -39,6 +39,8 @@ class Server:
             # The server responds
             print("Server has received: " + str(message) + " which is " + str(int.from_bytes(message, byteorder='big')))
 
+            print(str(message[0]) + str(message[1]) + str(message[2]) + str(message[3]))
+
             self.serverSend(packet.Packet(12501, 12500, 0, 0, 0, 0, 0, "data"), connection, serverSocket)
 
     def serverSend(self, packet, connection, serverSocket):
