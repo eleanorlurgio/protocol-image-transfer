@@ -13,6 +13,11 @@ import packet
 BUFFER_SIZE = 1024000
 
 class Server:
+
+    def __init__(self, sourceIP, sourcePort):
+        self.sourceIP = sourceIP
+        self.sourcePort = sourcePort
+
     # Listen for incoming requests
     def serverListen(self):
 
@@ -20,7 +25,7 @@ class Server:
         serverSocket = socket.socket(family=AF_INET, type=SOCK_DGRAM)
 
         # Assign IP address and port number to socket
-        serverSocket.bind(('127.0.0.1', 12501))
+        serverSocket.bind((self.sourceIP, self.sourcePort))
 
         while True:
             # Receive the client packet along with the address it is coming from
@@ -32,12 +37,12 @@ class Server:
             # my_img = cv2.imread("image_white.png", cv2.IMREAD_GRAYSCALE)
 
             # The server responds
-            print("                                      "+ ": " + str(message))
+            print("Server has received: " + str(message))
 
             self.serverSend(packet.Packet(12501, 12500, 0, 0, 0, 0, 0, "data"), connection, serverSocket)
 
     def serverSend(self, packet, connection, serverSocket):
-            serverSocket.sendto(packet.toByteArray(), connection[1])
+            serverSocket.sendto(packet.packet.encode(), connection[1])
         
-server = Server()
+server = Server('127.0.0.1', 12501)
 server.serverListen()

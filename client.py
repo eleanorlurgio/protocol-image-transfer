@@ -46,7 +46,7 @@ class Client:
 		while True:
 			# Send the message using the clientSock
 			# clientSock.sendto(Message, (UDP_IP_ADDRESS, UDP_PORT_NO))
-			clientSock.sendto(packet.toByteArray(), (UDP_IP_ADDRESS, UDP_PORT_NO))
+			clientSock.sendto(packet.packet.encode(), (UDP_IP_ADDRESS, UDP_PORT_NO))
 
 			# Receive response
 			print('waiting to receive')
