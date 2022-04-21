@@ -2,7 +2,7 @@
 
 import random
 from socket import *
-from email import message
+from email import message, message_from_bytes
 import sys
 from threading import Thread
 import socket
@@ -37,12 +37,12 @@ class Server:
             # my_img = cv2.imread("image_white.png", cv2.IMREAD_GRAYSCALE)
 
             # The server responds
-            print("Server has received: " + str(message))
+            print("Server has received: " + str(message) + " which is " + str(int.from_bytes(message, byteorder='big')))
 
             self.serverSend(packet.Packet(12501, 12500, 0, 0, 0, 0, 0, "data"), connection, serverSocket)
 
     def serverSend(self, packet, connection, serverSocket):
-            serverSocket.sendto(packet.packet.encode(), connection[1])
+            serverSocket.sendto(packet.toByteArray(), connection[1])
         
 server = Server('127.0.0.1', 12501)
 server.serverListen()
