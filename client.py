@@ -77,7 +77,7 @@ class Client:
 
 	def initialiseConnection(self):
 		# Send packet 1
-		clientPacket = packet.Packet(self.sourcePort, 12501, 1, 1, 0, 0, 0, "hi")
+		clientPacket = packet.Packet(self.sourcePort, 12501, 1, 1, 2, 3, 4, "hi")
 		# print(clientPacket.header)
 
 		self.clientSend(clientPacket)

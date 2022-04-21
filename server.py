@@ -37,9 +37,10 @@ class Server:
             # my_img = cv2.imread("image_white.png", cv2.IMREAD_GRAYSCALE)
 
             # The server responds
-            print("Server has received: " + str(message) + " which is " + str(int.from_bytes(message, byteorder='big')))
+            print("Server has received: " + str(message) + " which is " + str(int.from_bytes(message[5:8], byteorder='big')))
 
-            print(str(message[0]) + str(message[1]) + str(message[2]) + str(message[3]))
+            print(str(message[1:24]))
+            print(str(message[21:24]))
 
             self.serverSend(packet.Packet(12501, 12500, 0, 0, 0, 0, 0, "data"), connection, serverSocket)
 
