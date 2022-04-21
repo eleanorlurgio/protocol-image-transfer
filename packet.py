@@ -4,10 +4,10 @@ class Packet:
         self.sourcePort = sourcePort
         self.destinationPort = destinationPort
         # self.header = bytes(sourcePort) + bytes(destinationPort) + bytes(seqNum) + bytes(ackNum) + bytes(ackBit) + bytes(synBit) + bytes(finBit)
-        self.header = str(sourcePort) + str(destinationPort) + str(seqNum) + str(ackNum) + str(ackBit) + str(synBit) + str(finBit)
+        self.header = int(str(sourcePort) + str(destinationPort) + str(seqNum) + str(ackNum) + str(ackBit) + str(synBit) + str(finBit))
         self.data = str(data)
 
-        self.packet = self.header + self.data
+        # self.packet = self.header + self.data
 
     # def setHeader(self, seqNum, ackNum, ackBit, synBit, finBit):
     #     seqNum = seqNum
@@ -38,5 +38,5 @@ class Packet:
         data = data
 
     def toByteArray(self):
-        print(self.packet)
-        return bytearray(self.packet)
+        # print(self.packet)
+        return self.header.to_bytes(24, byteorder='big')
