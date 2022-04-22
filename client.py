@@ -20,7 +20,7 @@ class Client:
 
 	# The connection is defined by a tuple (source IP, source port, destination IP, destination port)
 	# Send data
-	def clientSend(self, packet):
+	def clientSend(self, packetToSend):
 		# Create a UDP socket
 		UDP_IP_ADDRESS = self.sourceIP
 		UDP_PORT_NO = 8080
@@ -32,7 +32,7 @@ class Client:
 		while True:
 			# Send the message using the clientSock
 			# clientSock.sendto(Message, (UDP_IP_ADDRESS, UDP_PORT_NO))
-			clientSock.sendto(packet.toByteArray(), (UDP_IP_ADDRESS, UDP_PORT_NO))
+			clientSock.sendto(packetToSend.toByteArray(), (UDP_IP_ADDRESS, UDP_PORT_NO))
 
 			# Receive response
 			print('waiting to receive')
@@ -62,6 +62,17 @@ class Client:
 		print("Syn bit: " + str(int.from_bytes(message[16:20], byteorder='big')))
 		print("Fin bit: " + str(int.from_bytes(message[20:24], byteorder='big')))
         # print("Data: " + str(int.from_bytes(message[0:1], byteorder='big')))
+
+		# Check bits of received packet
+
+        # If synBit == 1 and ackBit = 1
+		if (int.from_bytes(message[16:20], byteorder='big') == 1) and (str(int.from_bytes(message[12:16], byteorder='big') == 1)):
+			print("Handshake 2/3 complete")
+
+            # sourcePort, destinationPort, seqNum, ackNum, ackBit, synBit, finBit, windowSize, data
+			clientPacket = packet.Packet(self.sourcePort, int.from_bytes(message[2:4], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, False, 1024, 0)
+			self.clientSend(clientPacket)
+
 
 		# Close the socket
 		print('closing socket')

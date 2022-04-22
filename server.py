@@ -60,5 +60,13 @@ class Server:
             serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[2:4], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), True, True, False, 1024, 0)
             serverSocket.sendto(serverPacket.toByteArray(), address)
         
+        # If ackBit == 1
+        if int.from_bytes(message[12:16], byteorder='big') == 1:
+            print("Handshake 3/3 complete")
+            print("CONNECTION ESTABLISHED")
+
+            
+
+
 server = Server('127.0.0.1', 8080)
 server.serverListen()
