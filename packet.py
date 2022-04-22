@@ -48,12 +48,12 @@ class Packet:
 
         byteArray = bytearray()
 
-        byteArray[1:2] = self.sourcePort.to_bytes(2, byteorder='big')   # Allocate 2 bytes
-        byteArray[3:4] = self.destinationPort.to_bytes(2, byteorder='big')  # Allocate 2 bytes
-        byteArray[5:8] = self.seqNum.to_bytes(4, byteorder='big')   # Allocate 4 bytes
-        byteArray[9:12] = self.ackNum.to_bytes(4, byteorder='big')   # Allocate 4 bytes
-        byteArray[13:16] = self.ackBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes
-        byteArray[17:20] = self.synBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes
-        byteArray[21:24] = self.finBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes
+        byteArray[0:2] = self.sourcePort.to_bytes(2, byteorder='big')   # Allocate 2 bytes
+        byteArray[2:4] = self.destinationPort.to_bytes(2, byteorder='big')  # Allocate 2 bytes
+        byteArray[4:8] = self.seqNum.to_bytes(4, byteorder='big')   # Allocate 4 bytes
+        byteArray[8:12] = self.ackNum.to_bytes(4, byteorder='big')   # Allocate 4 bytes
+        byteArray[12:16] = self.ackBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes
+        byteArray[16:20] = self.synBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes
+        byteArray[20:24] = self.finBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes
 
         return byteArray

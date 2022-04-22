@@ -10,13 +10,15 @@ from time import sleep, time
 from cv2 import cv2
 import packet
 
-BUFFER_SIZE = 1024000
+BUFFER_SIZE = 24
 
 class Server:
 
     def __init__(self, sourceIP, sourcePort):
         self.sourceIP = sourceIP
         self.sourcePort = sourcePort
+        print(self.sourceIP)
+        print(self.sourcePort)
 
     # Listen for incoming requests
     def serverListen(self):
@@ -43,16 +45,16 @@ class Server:
             # print(str(message[21:24]))
 
             print("\n* SERVER HAS RECEIVED *")
-            print("Source port: " + str(int.from_bytes(message[1:2], byteorder='big')))
-            print("Destination port: " + str(int.from_bytes(message[3:4], byteorder='big')))
-            print("Sequence number: " + str(int.from_bytes(message[5:8], byteorder='big')))
-            print("Ack number: " + str(int.from_bytes(message[9:12], byteorder='big')))
-            print("Ack bit: " + str(int.from_bytes(message[13:16], byteorder='big')))
-            print("Syn bit: " + str(int.from_bytes(message[17:20], byteorder='big')))
-            print("Fin bit: " + str(int.from_bytes(message[21:24], byteorder='big')))
+            print("Source port: " + str(int.from_bytes(message[0:2], byteorder='big')))
+            print("Destination port: " + str(int.from_bytes(message[2:4], byteorder='big')))
+            print("Sequence number: " + str(int.from_bytes(message[4:8], byteorder='big')))
+            print("Ack number: " + str(int.from_bytes(message[8:12], byteorder='big')))
+            print("Ack bit: " + str(int.from_bytes(message[12:16], byteorder='big')))
+            print("Syn bit: " + str(int.from_bytes(message[16:20], byteorder='big')))
+            print("Fin bit: " + str(int.from_bytes(message[20:24], byteorder='big')))
             # print("Data: " + str(int.from_bytes(message[0:1], byteorder='big')))
 
-            self.serverSend(packet.Packet(8080, 12500, 423894, 1, False, True, False, 1024, "hi"), receivedPacket, serverSocket)
+            self.serverSend(packet.Packet(8080, 15200, 423894, 1, False, True, False, 1024, "hi"), receivedPacket, serverSocket)
 
     def serverSend(self, packet, connection, serverSocket):
             serverSocket.sendto(packet.toByteArray(), connection[1])

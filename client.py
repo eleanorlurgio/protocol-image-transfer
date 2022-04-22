@@ -68,17 +68,17 @@ class Client:
 		message = serverPacket[0]
 		address = serverPacket[1]
 
-		print(str(serverPacket))
+		# print(str(serverPacket))
 		# print('client received: ' + str(img))
 
 		print("\n* CLIENT HAS RECEIVED *")
-		print("Source port: " + str(int.from_bytes(message[1:2], byteorder='big')))
-		print("Destination port: " + str(int.from_bytes(message[3:4], byteorder='big')))
-		print("Sequence number: " + str(int.from_bytes(message[5:8], byteorder='big')))
-		print("Ack number: " + str(int.from_bytes(message[9:12], byteorder='big')))
-		print("Ack bit: " + str(int.from_bytes(message[13:16], byteorder='big')))
-		print("Syn bit: " + str(int.from_bytes(message[17:20], byteorder='big')))
-		print("Fin bit: " + str(int.from_bytes(message[21:24], byteorder='big')))
+		print("Source port: " + str(int.from_bytes(message[0:2], byteorder='big')))
+		print("Destination port: " + str(int.from_bytes(message[2:4], byteorder='big')))
+		print("Sequence number: " + str(int.from_bytes(message[4:8], byteorder='big')))
+		print("Ack number: " + str(int.from_bytes(message[8:12], byteorder='big')))
+		print("Ack bit: " + str(int.from_bytes(message[12:16], byteorder='big')))
+		print("Syn bit: " + str(int.from_bytes(message[16:20], byteorder='big')))
+		print("Fin bit: " + str(int.from_bytes(message[20:24], byteorder='big')))
             # print("Data: " + str(int.from_bytes(message[0:1], byteorder='big')))
 
 		# Close the socket
@@ -90,7 +90,7 @@ class Client:
 		# Send packet 1 (syn packet)
 
 		# 11FalseTrueFalse
-		clientPacket = packet.Packet(12500, 8080, 423894, 1, False, True, False, 1024, "hi")
+		clientPacket = packet.Packet(15200, 8080, 423894, 1, False, True, False, 1024, "hi")
 		# clientPacket.setSynBit(True)
 		# print(clientPacket.header)
 		
