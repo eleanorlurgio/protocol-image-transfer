@@ -65,11 +65,21 @@ class Client:
 				continue
 			break
 
-		# img = serverPacket[0]
-		# address = serverPacket[1]
+		message = serverPacket[0]
+		address = serverPacket[1]
 
 		print(str(serverPacket))
 		# print('client received: ' + str(img))
+
+		print("\n* CLIENT HAS RECEIVED *")
+		print("Source port: " + str(int.from_bytes(message[1:2], byteorder='big')))
+		print("Destination port: " + str(int.from_bytes(message[3:4], byteorder='big')))
+		print("Sequence number: " + str(int.from_bytes(message[5:8], byteorder='big')))
+		print("Ack number: " + str(int.from_bytes(message[9:12], byteorder='big')))
+		print("Ack bit: " + str(int.from_bytes(message[13:16], byteorder='big')))
+		print("Syn bit: " + str(int.from_bytes(message[17:20], byteorder='big')))
+		print("Fin bit: " + str(int.from_bytes(message[21:24], byteorder='big')))
+            # print("Data: " + str(int.from_bytes(message[0:1], byteorder='big')))
 
 		# Close the socket
 		print('closing socket')

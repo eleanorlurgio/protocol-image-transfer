@@ -42,7 +42,7 @@ class Server:
             # print(str(message[1:24]))
             # print(str(message[21:24]))
 
-            print("SERVER HAS RECEIVED")
+            print("\n* SERVER HAS RECEIVED *")
             print("Source port: " + str(int.from_bytes(message[1:2], byteorder='big')))
             print("Destination port: " + str(int.from_bytes(message[3:4], byteorder='big')))
             print("Sequence number: " + str(int.from_bytes(message[5:8], byteorder='big')))
