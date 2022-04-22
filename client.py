@@ -10,7 +10,9 @@ from time import sleep, time
 from cv2 import cv2
 import packet
 
-BUFFER_SIZE = 1024000
+HEADER_SIZE = 24
+DATA_SIZE = 1000000
+BUFFER_SIZE = HEADER_SIZE + DATA_SIZE
 
 class Client:
 
@@ -39,7 +41,7 @@ class Client:
 
 			# Get the response & extract data
 			try:
-				serverPacket = clientSock.recvfrom(1024)
+				serverPacket = clientSock.recvfrom(BUFFER_SIZE)
 			except TimeoutError:
 				print("timeout")
 				sleep(0.1)
@@ -60,6 +62,7 @@ class Client:
 		ackBit = int.from_bytes(message[12:16], byteorder='big')
 		synBit = int.from_bytes(message[16:20], byteorder='big')
 		finBit = int.from_bytes(message[20:24], byteorder='big')
+		data = int.from_bytes(message[24:], byteorder='big')
 
 		print("\n* CLIENT HAS RECEIVED *")
 		print("Source port: " + str(sourcePort))
@@ -69,6 +72,7 @@ class Client:
 		print("Ack bit: " + str(ackBit))
 		print("Syn bit: " + str(synBit))
 		print("Fin bit: " + str(finBit))
+		print("Data: " + str(data))
         # print("Data: " + str(int.from_bytes(message[0:1], byteorder='big')))
 
 		# Check bits of received packet
@@ -83,6 +87,9 @@ class Client:
 
 
 		# Close the socket
+		# exit = str(input("Close connection? y/n: "))
+
+		# if exit == 'y':
 		print('closing socket')
 		clientSock.close()
 
@@ -97,15 +104,6 @@ class Client:
 		
 		self.clientSend(clientPacket, 8080)
 
-		# Receive packet 2
-
-		# Send packet 3
-
-		# Connection established
-
-		# Server sends packet with data
-
-		# Receive packet with data
 
 	def createClient():
 		# Set the IP address and port number of the client

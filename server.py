@@ -10,7 +10,9 @@ from time import sleep, time
 from cv2 import cv2
 import packet
 
-BUFFER_SIZE = 24
+HEADER_SIZE = 24
+DATA_SIZE = 1000000
+BUFFER_SIZE = HEADER_SIZE + DATA_SIZE
 
 class Server:
 
@@ -40,6 +42,7 @@ class Server:
             ackBit = int.from_bytes(message[12:16], byteorder='big')
             synBit = int.from_bytes(message[16:20], byteorder='big')
             finBit = int.from_bytes(message[20:24], byteorder='big')
+            data = int.from_bytes(message[24:], byteorder='big')
 
             # Set message to the data to be sent back
             # my_img = cv2.imread("image_white.png", cv2.IMREAD_GRAYSCALE)
@@ -52,6 +55,7 @@ class Server:
             print("Ack bit: " + str(ackBit))
             print("Syn bit: " + str(synBit))
             print("Fin bit: " + str(finBit))
+            print("Data: " + str(data))
             # print("Data: " + str(int.from_bytes(message[0:1], byteorder='big')))
 
             # self.serverSend(message, address, serverSocket)
@@ -68,7 +72,11 @@ class Server:
             if ackBit == 1:
                 print("Handshake 3/3 complete")
                 print("CONNECTION ESTABLISHED")
-                
+
+                # Send packet with data
+                serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), False, False, False, 1024, 123456789)
+                serverSocket.sendto(serverPacket.toByteArray(), address)
+
 
 server = Server('127.0.0.1', 8080)
 server.serverListen()
