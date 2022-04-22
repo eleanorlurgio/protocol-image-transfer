@@ -21,41 +21,42 @@ class Client:
 		self.sourceIP = sourceIP
 		self.sourcePort = sourcePort
 
-	# The connection is defined by a tuple (source IP, source port, destination IP, destination port)
-	# Send data
+	# Client listens and responds
 	def clientSend(self, packetToSend, destinationPort):
-		# Create a UDP socket
+		# Define IP address and port number to send to (both client and server on the same IP address)
 		UDP_IP_ADDRESS = self.sourceIP
 		UDP_PORT_NO = destinationPort
 
-		# Create a socket with a 1s timeout
+		# Create a UDP socket with a timeout of 1.0 second
 		clientSock = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-		clientSock.settimeout(2.0)
+		clientSock.settimeout(1.0)
 
+		# Client listens continuously
 		while True:
-			# Send the message using the clientSock
-			# clientSock.sendto(Message, (UDP_IP_ADDRESS, UDP_PORT_NO))
+			# Send packet as bytearray
 			clientSock.sendto(packetToSend.toByteArray(), (UDP_IP_ADDRESS, UDP_PORT_NO))
 
-			# Receive response
-			print('waiting to receive')
+			# Waiting
+			print('Waiting to receive')
 
-			# Get the response & extract data
+			# Receive packet from clientSock, show error message if nothing is received and continue listening
 			try:
 				serverPacket = clientSock.recvfrom(BUFFER_SIZE)
 			except TimeoutError:
-				print("timeout")
+				print("Timeout")
 				sleep(0.1)
 				continue
 			except ConnectionResetError:
-				print("server not up")
+				print("Server not up")
 				sleep(0.1)
 				continue
 			break
 
+		# Split received packet into contents and address
 		message = serverPacket[0]
 		address = serverPacket[1]
 
+		# Read bytes
 		sourcePort = int.from_bytes(message[0:2], byteorder='big')
 		destPort = int.from_bytes(message[2:4], byteorder='big')
 		seqNum = int.from_bytes(message[4:8], byteorder='big')
@@ -64,13 +65,8 @@ class Client:
 		synBit = int.from_bytes(message[16:20], byteorder='big')
 		finBit = int.from_bytes(message[20:24], byteorder='big')
 		data = message[24:]
-		# img = cv2.imdecode(data, flags=1)
-		# cv2.imwrite('./0.jpg', img)
 
-		# nparr = numpy.fromstring(data, dtype=numpy.uint8)
-		# frame = cv2.imdecode(nparr, cv2.IMREAD_GRAYSCALE)
-		# cv2.imshow('image', frame)
-
+		# Display packet contents in terminal
 		print("\n* CLIENT HAS RECEIVED *")
 		print("Source port: " + str(sourcePort))
 		print("Destination port: " + str(destPort))
@@ -80,44 +76,34 @@ class Client:
 		print("Syn bit: " + str(synBit))
 		print("Fin bit: " + str(finBit))
 		print("Data: " + str(data))
-        # print("Data: " + str(int.from_bytes(message[0:1], byteorder='big')))
 
-		# Check bits of received packet
+		# Check bits of received packet to respond accordingly
 
-        # If synBit == 1 and ackBit = 1
+        # Complete handshake 2/3
 		if (synBit == 1) and (ackBit == 1):
 			print("Handshake 2/3 complete")
 
-            # sourcePort, destinationPort, seqNum, ackNum, ackBit, synBit, finBit, windowSize, data
+            # Send response packet
 			clientPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, False, 1024, 0)
 			self.clientSend(clientPacket, (int.from_bytes(message[0:2], byteorder='big')))
 
-
-		# Close the socket
-		# exit = str(input("Close connection? y/n: "))
-
+		# Check if there is an image received
 		if data:
-			# print(data)
-			# decoded = cv2.imdecode(numpy.frombuffer(data, numpy.uint8), -1)
-			# print('OpenCV:\n', decoded)
-			    #Gives us 1d array
+			# Decodes data into a 1D array
 			decoded = numpy.frombuffer(data, dtype=numpy.uint8)
-			#We have to convert it into (270, 480,3) in order to see as an image
+			# Reshapes the image to its original formation
 			decoded = decoded.reshape((8, 8, 1))
+			# Displays image in a window until closed
 			cv2.imshow('Image', decoded)
 			cv2.waitKey(0)
 
-		# if exit == 'y':
-		print('closing socket')
+		# Close socket
+		print('Closing socket')
 		clientSock.close()
-
-	# def generatePacket():
 
 
 	def initialiseConnection(self):
-		# Handshake 1/3
-
-		# sourcePort, destinationPort, seqNum, ackNum, ackBit, synBit, finBit, windowSize, data
+		# Create and send first packet
 		clientPacket = packet.Packet(self.sourcePort, 8080, random.randint(0, 2147483647), 0, False, True, False, 1024, NULL)
 		
 		self.clientSend(clientPacket, 8080)
@@ -134,7 +120,7 @@ class Client:
 		# Start 3 way handshake procedure
 		client.initialiseConnection()
 
-# Initialise client with IP and port number
+# Initialise client
 Client.createClient()
 
 	
