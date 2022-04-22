@@ -1,4 +1,5 @@
 # import server
+from asyncio.windows_events import NULL
 import random
 from socket import *
 from email import message
@@ -24,29 +25,13 @@ class Client:
 		UDP_IP_ADDRESS = self.sourceIP
 		UDP_PORT_NO = 8080
 
-		# Request message from user client
-		# Message = str.encode("request photo")
-
-		# Read image
-		# my_img = cv2.imread("image_black.png", cv2.IMREAD_GRAYSCALE)
-		# packet.setData(my_img)
-		# print(my_img)
-		# cv2.imshow('My image', my_img)
-		# cv2.waitKey(0)
-
-		# sleep(1000)
-
 		# Create a socket with a 1s timeout
 		clientSock = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 		clientSock.settimeout(2.0)
 
-		# Send data to client
-		# print('Ping %d %s' % (1,Message.decode()))
-
 		while True:
 			# Send the message using the clientSock
 			# clientSock.sendto(Message, (UDP_IP_ADDRESS, UDP_PORT_NO))
-			# bytearray(packet.toByteArray(), 'utf-8')
 			clientSock.sendto(packet.toByteArray(), (UDP_IP_ADDRESS, UDP_PORT_NO))
 
 			# Receive response
@@ -68,9 +53,6 @@ class Client:
 		message = serverPacket[0]
 		address = serverPacket[1]
 
-		# print(str(serverPacket))
-		# print('client received: ' + str(img))
-
 		print("\n* CLIENT HAS RECEIVED *")
 		print("Source port: " + str(int.from_bytes(message[0:2], byteorder='big')))
 		print("Destination port: " + str(int.from_bytes(message[2:4], byteorder='big')))
@@ -79,20 +61,20 @@ class Client:
 		print("Ack bit: " + str(int.from_bytes(message[12:16], byteorder='big')))
 		print("Syn bit: " + str(int.from_bytes(message[16:20], byteorder='big')))
 		print("Fin bit: " + str(int.from_bytes(message[20:24], byteorder='big')))
-            # print("Data: " + str(int.from_bytes(message[0:1], byteorder='big')))
+        # print("Data: " + str(int.from_bytes(message[0:1], byteorder='big')))
 
 		# Close the socket
 		print('closing socket')
 		clientSock.close()
 
+	# def generatePacket():
+
 
 	def initialiseConnection(self):
-		# Send packet 1 (syn packet)
+		# Handshake 1/3
 
-		# 11FalseTrueFalse
-		clientPacket = packet.Packet(15200, 8080, 423894, 1, False, True, False, 1024, "hi")
-		# clientPacket.setSynBit(True)
-		# print(clientPacket.header)
+		# sourcePort, destinationPort, seqNum, ackNum, ackBit, synBit, finBit, windowSize, data
+		clientPacket = packet.Packet(self.sourcePort, 8080, random.randint(0, 2147483647), 0, False, True, False, 1024, NULL)
 		
 		self.clientSend(clientPacket)
 

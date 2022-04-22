@@ -17,8 +17,6 @@ class Server:
     def __init__(self, sourceIP, sourcePort):
         self.sourceIP = sourceIP
         self.sourcePort = sourcePort
-        print(self.sourceIP)
-        print(self.sourcePort)
 
     # Listen for incoming requests
     def serverListen(self):
@@ -38,12 +36,6 @@ class Server:
             # Set message to the data to be sent back
             # my_img = cv2.imread("image_white.png", cv2.IMREAD_GRAYSCALE)
 
-            # The server responds
-            # print("Server has received: " + str(message) + " which is " + str(int.from_bytes(message[5:8], byteorder='big')))
-
-            # print(str(message[1:24]))
-            # print(str(message[21:24]))
-
             print("\n* SERVER HAS RECEIVED *")
             print("Source port: " + str(int.from_bytes(message[0:2], byteorder='big')))
             print("Destination port: " + str(int.from_bytes(message[2:4], byteorder='big')))
@@ -54,10 +46,19 @@ class Server:
             print("Fin bit: " + str(int.from_bytes(message[20:24], byteorder='big')))
             # print("Data: " + str(int.from_bytes(message[0:1], byteorder='big')))
 
-            self.serverSend(packet.Packet(8080, 15200, 423894, 1, False, True, False, 1024, "hi"), receivedPacket, serverSocket)
+            self.serverSend(message, address, serverSocket)
 
-    def serverSend(self, packet, connection, serverSocket):
-            serverSocket.sendto(packet.toByteArray(), connection[1])
+    def serverSend(self, message, address, serverSocket):
+
+        # Check bits of received packet
+
+        # If synBit == 1
+        if int.from_bytes(message[16:20], byteorder='big') == 1:
+            print("Handshake 1/3 complete")
+
+            # sourcePort, destinationPort, seqNum, ackNum, ackBit, synBit, finBit, windowSize, data
+            serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[2:4], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), True, True, False, 1024, 0)
+            serverSocket.sendto(serverPacket.toByteArray(), address)
         
 server = Server('127.0.0.1', 8080)
 server.serverListen()
