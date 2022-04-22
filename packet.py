@@ -60,5 +60,5 @@ class Packet:
         byteArray[16:20] = self.synBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes
         byteArray[20:24] = self.finBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes
         byteArray[24:] = bytearray(self.data)   # Allocate lots of bytes
-        print(byteArray)
+        # print(byteArray)
         return byteArray

@@ -8,6 +8,7 @@ from threading import Thread
 import socket
 from time import sleep, time
 from cv2 import cv2
+import numpy
 import packet
 
 HEADER_SIZE = 24
@@ -63,6 +64,12 @@ class Client:
 		synBit = int.from_bytes(message[16:20], byteorder='big')
 		finBit = int.from_bytes(message[20:24], byteorder='big')
 		data = message[24:]
+		# img = cv2.imdecode(data, flags=1)
+		# cv2.imwrite('./0.jpg', img)
+
+		# nparr = numpy.fromstring(data, dtype=numpy.uint8)
+		# frame = cv2.imdecode(nparr, cv2.IMREAD_GRAYSCALE)
+		# cv2.imshow('image', frame)
 
 		print("\n* CLIENT HAS RECEIVED *")
 		print("Source port: " + str(sourcePort))
@@ -88,6 +95,17 @@ class Client:
 
 		# Close the socket
 		# exit = str(input("Close connection? y/n: "))
+
+		if data:
+			# print(data)
+			# decoded = cv2.imdecode(numpy.frombuffer(data, numpy.uint8), -1)
+			# print('OpenCV:\n', decoded)
+			    #Gives us 1d array
+			decoded = numpy.frombuffer(data, dtype=numpy.uint8)
+			#We have to convert it into (270, 480,3) in order to see as an image
+			decoded = decoded.reshape((8, 8, 1))
+			cv2.imshow('Image', decoded)
+			cv2.waitKey(0)
 
 		# if exit == 'y':
 		print('closing socket')
