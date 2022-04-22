@@ -73,8 +73,11 @@ class Server:
                 print("Handshake 3/3 complete")
                 print("CONNECTION ESTABLISHED")
 
+                # Set message to the data to be sent back
+                img = cv2.imread("image_black.png", cv2.IMREAD_GRAYSCALE)
+
                 # Send packet with data
-                serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), False, False, False, 1024, 123456789)
+                serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), False, False, False, 1024, img)
                 serverSocket.sendto(serverPacket.toByteArray(), address)
 
 

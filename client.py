@@ -62,7 +62,7 @@ class Client:
 		ackBit = int.from_bytes(message[12:16], byteorder='big')
 		synBit = int.from_bytes(message[16:20], byteorder='big')
 		finBit = int.from_bytes(message[20:24], byteorder='big')
-		data = int.from_bytes(message[24:], byteorder='big')
+		data = message[24:]
 
 		print("\n* CLIENT HAS RECEIVED *")
 		print("Source port: " + str(sourcePort))

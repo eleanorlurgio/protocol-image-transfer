@@ -9,7 +9,8 @@ class Packet:
         self.synBit = bool(synBit) 
         self.finBit = bool(finBit)       
         self.windowSize = int(windowSize)   
-        self.data = int(data)
+        self.data = data
+        # print(bytearray(data))
 
         # self.packet = self.header + self.data
 
@@ -58,5 +59,6 @@ class Packet:
         byteArray[12:16] = self.ackBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes
         byteArray[16:20] = self.synBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes
         byteArray[20:24] = self.finBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes
-        byteArray[24:] = self.data.to_bytes(10000, byteorder='big')   # Allocate lots of bytes
+        byteArray[24:] = bytearray(self.data)   # Allocate lots of bytes
+        print(byteArray)
         return byteArray
