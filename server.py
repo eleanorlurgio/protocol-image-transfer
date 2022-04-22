@@ -57,7 +57,7 @@ class Server:
             print("Handshake 1/3 complete")
 
             # sourcePort, destinationPort, seqNum, ackNum, ackBit, synBit, finBit, windowSize, data
-            serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[2:4], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), True, True, False, 1024, 0)
+            serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), True, True, False, 1024, 0)
             serverSocket.sendto(serverPacket.toByteArray(), address)
         
         # If ackBit == 1

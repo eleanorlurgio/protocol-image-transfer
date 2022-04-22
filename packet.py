@@ -41,6 +41,9 @@ class Packet:
     def setData(data):
         data = data
 
+    def getDestinationPort(self):
+        return self.destinationPort
+
     def getWindowSize(self):
         return self.windowSize
 

@@ -20,10 +20,10 @@ class Client:
 
 	# The connection is defined by a tuple (source IP, source port, destination IP, destination port)
 	# Send data
-	def clientSend(self, packetToSend):
+	def clientSend(self, packetToSend, destinationPort):
 		# Create a UDP socket
 		UDP_IP_ADDRESS = self.sourceIP
-		UDP_PORT_NO = 8080
+		UDP_PORT_NO = destinationPort
 
 		# Create a socket with a 1s timeout
 		clientSock = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
@@ -70,8 +70,8 @@ class Client:
 			print("Handshake 2/3 complete")
 
             # sourcePort, destinationPort, seqNum, ackNum, ackBit, synBit, finBit, windowSize, data
-			clientPacket = packet.Packet(self.sourcePort, int.from_bytes(message[2:4], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, False, 1024, 0)
-			self.clientSend(clientPacket)
+			clientPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, False, 1024, 0)
+			self.clientSend(clientPacket, (int.from_bytes(message[0:2], byteorder='big')))
 
 
 		# Close the socket
@@ -87,7 +87,7 @@ class Client:
 		# sourcePort, destinationPort, seqNum, ackNum, ackBit, synBit, finBit, windowSize, data
 		clientPacket = packet.Packet(self.sourcePort, 8080, random.randint(0, 2147483647), 0, False, True, False, 1024, NULL)
 		
-		self.clientSend(clientPacket)
+		self.clientSend(clientPacket, 8080)
 
 		# Receive packet 2
 
