@@ -31,12 +31,13 @@ class Client:
 		clientSock = socket.socket(family=AF_INET, type=SOCK_DGRAM)
 		clientSock.settimeout(1.0)
 
-		# Send packet as bytearray
-		clientSock.sendto(packetToSend.toByteArray(), (UDP_IP_ADDRESS, UDP_PORT_NO))
+		
 
 		# Client listens continuously
 		while True:
 
+			# Send packet as bytearray
+			clientSock.sendto(packetToSend.toByteArray(), (UDP_IP_ADDRESS, UDP_PORT_NO))
 			# Waiting
 			print('Waiting to receive')
 
@@ -85,7 +86,7 @@ class Client:
 			print("Handshake 2/3 complete")
 
             # Send response packet
-			clientPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, False, 1024, 0)
+			clientPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, False, 1024, NULL)
 			self.clientSend(clientPacket, (int.from_bytes(message[0:2], byteorder='big')))
 
 		# Check if there is an image received

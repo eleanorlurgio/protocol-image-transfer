@@ -1,5 +1,6 @@
 # p2p.py>
 
+from asyncio.windows_events import NULL
 import random
 from socket import *
 from email import message, message_from_bytes
@@ -65,7 +66,7 @@ class Server:
                 print("Handshake 1/3 complete")
 
                 # Send response packet
-                serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), True, True, False, 1024, 0)
+                serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), True, True, False, 1024, NULL)
                 serverSocket.sendto(serverPacket.toByteArray(), address)
             
             # Complete handshake 3/3
