@@ -28,13 +28,14 @@ class Client:
 		UDP_PORT_NO = destinationPort
 
 		# Create a UDP socket with a timeout of 1.0 second
-		clientSock = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+		clientSock = socket.socket(family=AF_INET, type=SOCK_DGRAM)
 		clientSock.settimeout(1.0)
+
+		# Send packet as bytearray
+		clientSock.sendto(packetToSend.toByteArray(), (UDP_IP_ADDRESS, UDP_PORT_NO))
 
 		# Client listens continuously
 		while True:
-			# Send packet as bytearray
-			clientSock.sendto(packetToSend.toByteArray(), (UDP_IP_ADDRESS, UDP_PORT_NO))
 
 			# Waiting
 			print('Waiting to receive')
