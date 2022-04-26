@@ -31,13 +31,19 @@ class Client:
 		clientSock = socket.socket(family=AF_INET, type=SOCK_DGRAM)
 		clientSock.settimeout(1.0)
 
-		
+		# Send packet as bytearray
 
 		# Client listens continuously
 		while True:
+			while True:
+				try:
+					clientSock.sendto(packetToSend.toByteArray(), (UDP_IP_ADDRESS, UDP_PORT_NO))
+				except ConnectionResetError:
+					print("Server not up")
+					sleep(0.1)
+					continue
+				break
 
-			# Send packet as bytearray
-			clientSock.sendto(packetToSend.toByteArray(), (UDP_IP_ADDRESS, UDP_PORT_NO))
 			# Waiting
 			print('Waiting to receive')
 
