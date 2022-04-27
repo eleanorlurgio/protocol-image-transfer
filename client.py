@@ -16,6 +16,7 @@ DATA_SIZE = 60
 BUFFER_SIZE = HEADER_SIZE + DATA_SIZE
 
 img = []
+# img = ""
 
 class Client:
 
@@ -106,7 +107,9 @@ class Client:
 		# Check if there is an image received
 		if data:
 			print("data received")
-			img.append(data)
+			# img.append(data)
+			print(type(data.decode()))
+			img.append(data.decode())
 
 			ackPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[24:25], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, False, 1024, NULL)
 			self.clientSend(ackPacket, (int.from_bytes(message[0:2], byteorder='big')))
@@ -115,17 +118,26 @@ class Client:
 		if finBit == 1:
 			print("finbit acknowledged!")
 			# Decodes data into a 1D array
-			decoded = numpy.frombuffer(data, dtype=numpy.uint8)
-			# # Reshapes the image to its original formation
-			# decoded = decoded.reshape((8, 8, 1))
-			# # Displays image in a window until closed
-			cv2.imshow('Image', decoded)
-			cv2.waitKey(0)
+			# decoded = numpy.frombuffer(bytearray(img), dtype=numpy.uint8)
+			# # # Reshapes the image to its original formation
+			# # decoded = decoded.reshape((8, 8, 1))
+			# # # Displays image in a window until closed
+			# cv2.imshow('Image', decoded)
+			# cv2.waitKey(0)
+
+			# image_height = 300
+			# image_width = 300
+			# number_of_color_channels = 3
+			# color = (255,0,255)
+			# pixel_array = numpy.full((image_height, image_width, number_of_color_channels), color, dtype=numpy.uint8)
+			# cv2.imshow('image', img)
+			# cv2.waitKey(0)
+
 			print(img)
 
 		# Close socket
 		print('closing socket')
-		clientSock.close()
+		#clientSock.close()
 
 
 	def initialiseConnection(self):
