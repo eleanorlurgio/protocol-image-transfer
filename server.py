@@ -1,6 +1,7 @@
 # p2p.py>
 
 from asyncio.windows_events import NULL
+import math
 import random
 from socket import *
 from email import message, message_from_bytes
@@ -9,10 +10,11 @@ from threading import Thread
 import socket
 from time import sleep, time
 from cv2 import cv2
+from numpy import size
 import packet
 
 HEADER_SIZE = 24
-DATA_SIZE = 1000000
+DATA_SIZE = 60
 BUFFER_SIZE = HEADER_SIZE + DATA_SIZE
 
 class Server:
@@ -61,6 +63,8 @@ class Server:
 
             # Check bits of received packet to respond accordingly
 
+            # HANDSHAKE TO CONNECT
+
             # Complete handshake 1/3
             if synBit == 1:
                 print("Handshake 1/3 complete")
@@ -75,11 +79,45 @@ class Server:
                 print("CONNECTION ESTABLISHED")
 
                 # Read image to be sent as data in the packet
-                img = cv2.imread("image_black.png", cv2.IMREAD_GRAYSCALE)
+                # img = cv2.imread("image_black.png", cv2.IMREAD_GRAYSCALE)
 
-                # Send response packet with data
-                serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), False, False, False, 1024, img)
-                serverSocket.sendto(serverPacket.toByteArray(), address)
+                # # Send response packet with data
+                # serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), False, False, False, 1024, img)
+                # serverSocket.sendto(serverPacket.toByteArray(), address)
+
+                # SEND IMAGE
+                self.sendImage(serverSocket, message, address)
+
+            # HANDSHAKE TO DISCONNECT
+
+    def sendImage(self, serverSocket, message, address):
+        # Read image to be sent as data in the packet
+        img = cv2.imread("image_black.png", cv2.IMREAD_GRAYSCALE)
+
+        print(size(img))
+
+        noOfPackets = math.ceil(size(img) / DATA_SIZE)
+
+        print(noOfPackets)
+
+        print(img[0:(60)])
+
+        startByte = 0
+
+        for i in range(0, noOfPackets):
+            
+
+            # Send response packet with data
+            serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), False, False, False, 1024, img[startByte:(startByte+60)])
+            serverSocket.sendto(serverPacket.toByteArray(), address)
+
+            startByte += 60
+
+            
+
+        # Close connection 1/4
+        serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, 0)
+        serverSocket.sendto(serverPacket.toByteArray(), address)
 
 # Initialise and start server
 server = Server('127.0.0.1', 8080)

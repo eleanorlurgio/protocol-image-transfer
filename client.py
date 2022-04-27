@@ -15,6 +15,8 @@ HEADER_SIZE = 24
 DATA_SIZE = 1000000
 BUFFER_SIZE = HEADER_SIZE + DATA_SIZE
 
+img = []
+
 class Client:
 
 	def __init__(self, sourceIP, sourcePort):
@@ -95,15 +97,27 @@ class Client:
 			clientPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, False, 1024, NULL)
 			self.clientSend(clientPacket, (int.from_bytes(message[0:2], byteorder='big')))
 
+		# RECEIVE IMAGE
+
+		
+
 		# Check if there is an image received
 		if data:
+			img.append(data)
+
+			ackPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[24:25], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, False, 1024, NULL)
+			self.clientSend(ackPacket, (int.from_bytes(message[0:2], byteorder='big')))
+
+
+		if finBit == 1:
 			# Decodes data into a 1D array
 			decoded = numpy.frombuffer(data, dtype=numpy.uint8)
-			# Reshapes the image to its original formation
-			decoded = decoded.reshape((8, 8, 1))
-			# Displays image in a window until closed
+			# # Reshapes the image to its original formation
+			# decoded = decoded.reshape((8, 8, 1))
+			# # Displays image in a window until closed
 			cv2.imshow('Image', decoded)
 			cv2.waitKey(0)
+			print(img)
 
 		# Close socket
 		print('Closing socket')
