@@ -12,7 +12,7 @@ import numpy
 import packet
 
 HEADER_SIZE = 24
-DATA_SIZE = 1000000
+DATA_SIZE = 60
 BUFFER_SIZE = HEADER_SIZE + DATA_SIZE
 
 img = []
@@ -86,6 +86,8 @@ class Client:
 		print("Syn bit: " + str(synBit))
 		print("Fin bit: " + str(finBit))
 		print("Data: " + str(data))
+		# print("Data: ", len(data))
+		# print("Data: ", data.decode("utf-8"))
 
 		# Check bits of received packet to respond accordingly
 
@@ -111,6 +113,7 @@ class Client:
 
 
 		if finBit == 1:
+			print("finbit acknowledged!")
 			# Decodes data into a 1D array
 			decoded = numpy.frombuffer(data, dtype=numpy.uint8)
 			# # Reshapes the image to its original formation
@@ -121,7 +124,7 @@ class Client:
 			print(img)
 
 		# Close socket
-		print('Closing socket')
+		print('closing socket')
 		clientSock.close()
 
 

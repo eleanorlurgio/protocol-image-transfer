@@ -17,11 +17,13 @@ HEADER_SIZE = 24
 DATA_SIZE = 60
 BUFFER_SIZE = HEADER_SIZE + DATA_SIZE
 
+
 class Server:
 
     def __init__(self, sourceIP, sourcePort):
         self.sourceIP = sourceIP
         self.sourcePort = sourcePort
+        self.connection = False
 
     # Server listens and responds
     def serverListen(self):
@@ -70,13 +72,24 @@ class Server:
                 print("Handshake 1/3 complete")
 
                 # Send response packet
-                serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), True, True, False, 1024, NULL)
+                serverPacket = packet.Packet(self.sourcePort, sourcePort, random.randint(0, 2147483647), (seqNum + 1), True, True, False, 1024, NULL)
                 serverSocket.sendto(serverPacket.toByteArray(), address)
             
             # Complete handshake 3/3
-            if ackBit == 1:
+            if (ackBit == 1) and (self.connection == False):
                 print("Handshake 3/3 complete")
                 print("CONNECTION ESTABLISHED")
+
+                self.connection = True
+
+                # Read image to be sent as data in the packet
+                img = cv2.imread("Rainbow.jpg", cv2.IMREAD_GRAYSCALE)
+                noOfPackets = math.ceil(size(img) / DATA_SIZE)
+                print("packet no is ", noOfPackets)
+
+                startByte = 0
+
+                self.sendImage(serverSocket, message, address, img, startByte, noOfPackets)
 
                 # Read image to be sent as data in the packet
                 # img = cv2.imread("image_black.png", cv2.IMREAD_GRAYSCALE)
@@ -86,43 +99,45 @@ class Server:
                 # serverSocket.sendto(serverPacket.toByteArray(), address)
 
                 # SEND IMAGE
-                self.sendImage(serverSocket, message, address)
+            if (ackBit == 1) and (self.connection == True):
+                        # Close connection 1/4
+                print("acknowledgement received")
+                startByte += 60
+                noOfPackets -= 1
+                self.sendImage(serverSocket, message, address, img, startByte, noOfPackets)
+                
 
             # HANDSHAKE TO DISCONNECT
 
-    def sendImage(self, serverSocket, message, address):
-        # Read image to be sent as data in the packet
-        img = cv2.imread("image_black.png", cv2.IMREAD_GRAYSCALE)
+    def sendImage(self, serverSocket, message, address, img, startByte, noOfPackets):
 
-        print(size(img))
 
-        noOfPackets = math.ceil(size(img) / DATA_SIZE)
+        # print(size(img))
+
+        # noOfPackets = math.ceil(size(img) / DATA_SIZE)
 
         print(noOfPackets)
 
-        print(img[0:(60)])
+        # print(str(img).encode("utf-8"))
+        # print(len(str(img).encode("utf-8")))
+        # print(size(img[startByte:(startByte+60)]))
 
-        startByte = 0
-
-        while startByte < size(img):
-            
-
+        if noOfPackets > 1:
             # Send response packet with data
-            serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), False, False, False, 1024, img[startByte:(startByte+60)])
+            serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), False, False, False, 1024, str(img)[startByte:startByte+60].encode("utf-8"))
             serverSocket.sendto(serverPacket.toByteArray(), address)
 
-            ackPacket = serverSocket.recvfrom(BUFFER_SIZE)
-            ackMessage = ackPacket[0]
+        # elif noOfPackets == 1:
+        #     # Send response packet with data
+        #     serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), False, False, False, 1024, img[startByte:])
+        #     serverSocket.sendto(serverPacket.toByteArray(), address)
 
-            if int.from_bytes(ackMessage[12:16], byteorder='big') == 1:
-                print("acknowledgement received")
-                startByte += 60
-
-
-
-        # Close connection 1/4
-        serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, 0)
-        serverSocket.sendto(serverPacket.toByteArray(), address)
+        else:
+            # Close connection 1/4
+            print("closing connection?")
+            closePacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, NULL)
+            print("sending close")
+            serverSocket.sendto(closePacket.toByteArray(), address)
 
 # Initialise and start server
 server = Server('127.0.0.1', 8080)
