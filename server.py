@@ -104,16 +104,21 @@ class Server:
 
         startByte = 0
 
-        for i in range(0, noOfPackets):
+        while startByte < size(img):
             
 
             # Send response packet with data
             serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), False, False, False, 1024, img[startByte:(startByte+60)])
             serverSocket.sendto(serverPacket.toByteArray(), address)
 
-            startByte += 60
+            ackPacket = serverSocket.recvfrom(BUFFER_SIZE)
+            ackMessage = ackPacket[0]
 
-            
+            if int.from_bytes(ackMessage[12:16], byteorder='big') == 1:
+                print("acknowledgement received")
+                startByte += 60
+
+
 
         # Close connection 1/4
         serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, 0)

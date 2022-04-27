@@ -103,6 +103,7 @@ class Client:
 
 		# Check if there is an image received
 		if data:
+			print("data received")
 			img.append(data)
 
 			ackPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[24:25], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, False, 1024, NULL)
