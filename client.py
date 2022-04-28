@@ -94,7 +94,7 @@ class Client:
 
         # Complete handshake 2/3
 		if (synBit == 1) and (ackBit == 1):
-			print("Handshake 2/3 complete")
+			print("Opening handshake 2/3 complete")
 
             # Send response packet
 			clientPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, False, 1024, NULL)
@@ -102,22 +102,18 @@ class Client:
 
 		# RECEIVE IMAGE
 
-		
-
 		# Check if there is an image received
 		if data:
 			print("data received")
-			# img.append(data)
-			# print(type(data))
+
 			img.append(data)
-			# print(data)
 
 			ackPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[24:25], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, False, 1024, NULL)
 			self.clientSend(ackPacket, (int.from_bytes(message[0:2], byteorder='big')))
 
 
 		if finBit == 1:
-			print("finbit acknowledged!")
+			print("Closing handshake 1/4 complete")
 
 			# i = 0
 			fullImg = b''
@@ -125,9 +121,6 @@ class Client:
 				fullImg = fullImg + img[i]
 				i += 1
 
-			# print(fullImg)
-			# print(img[0])
-			# print(img[1])
 			# Decodes data into a 1D array
 			decoded = numpy.frombuffer(fullImg, dtype=numpy.uint8)
 			# # Reshapes the image to its original formation
@@ -135,16 +128,6 @@ class Client:
 			# # Displays image in a window until closed
 			cv2.imshow('Image', decoded)
 			cv2.waitKey(0)
-
-			# image_height = 300
-			# image_width = 300
-			# number_of_color_channels = 3
-			# color = (255,0,255)
-			# pixel_array = numpy.full((image_height, image_width, number_of_color_channels), color, dtype=numpy.uint8)
-			# cv2.imshow('image', img)
-			# cv2.waitKey(0)
-
-			# print(img)
 
 		# Close socket
 		# print('closing socket')

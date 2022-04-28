@@ -70,7 +70,7 @@ class Server:
 
             # Complete handshake 1/3
             if synBit == 1:
-                print("Handshake 1/3 complete")
+                print("Opening handshake 1/3 complete")
 
                 # Send response packet
                 serverPacket = packet.Packet(self.sourcePort, sourcePort, random.randint(0, 2147483647), (seqNum + 1), True, True, False, 1024, NULL)
@@ -78,7 +78,7 @@ class Server:
             
             # Complete handshake 3/3
             if (ackBit == 1) and (self.connection == False):
-                print("Handshake 3/3 complete")
+                print("Opening handshake 3/3 complete")
                 print("CONNECTION ESTABLISHED")
 
                 self.connection = True
@@ -95,65 +95,32 @@ class Server:
                 # print(img.shape[0])
                 # sleep(1000)
 
-                # print("image type is", type(img))
                 noOfPackets = math.ceil(len(img) / DATA_SIZE)
-                print("packet no is ", noOfPackets)
+                print("The number of data packets is", noOfPackets)
 
                 startByte = 0
 
                 self.sendImage(serverSocket, message, address, img, startByte, noOfPackets)
 
-                # Read image to be sent as data in the packet
-                # img = cv2.imread("image_black.png", cv2.IMREAD_GRAYSCALE)
-
-                # # Send response packet with data
-                # serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), False, False, False, 1024, img)
-                # serverSocket.sendto(serverPacket.toByteArray(), address)
-
                 # SEND IMAGE
             if (ackBit == 1) and (self.connection == True):
-                        # Close connection 1/4
-                print("acknowledgement received")
+                # Acknowledgement packet received from client, so send next data packet
+                print("Acknowledgement packet received")
                 startByte += DATA_SIZE
                 noOfPackets -= 1
                 self.sendImage(serverSocket, message, address, img, startByte, noOfPackets)
                 
 
-            # HANDSHAKE TO DISCONNECT
-
     def sendImage(self, serverSocket, message, address, img, startByte, noOfPackets):
-
-
-        # print(size(img))
-
-        # noOfPackets = math.ceil(size(img) / DATA_SIZE)
-
-        print(noOfPackets)
-
-        # print(str(img).encode("utf-8"))
-        # print(len(str(img).encode("utf-8")))
-        # print(size(img[startByte:(startByte+60)]))
-        # print(len(str(img).encode("utf-8")))
-        print(type(img))
-        # print(img.flatten())
-        print(img[startByte:(startByte+DATA_SIZE)])
-        # print(str(img)[180:240].encode("utf-8"))
 
         if noOfPackets > 0:
             # Send response packet with data
             serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), False, False, False, 1024, img[startByte:(startByte+DATA_SIZE)])
             serverSocket.sendto(serverPacket.toByteArray(), address)
-
-        # elif noOfPackets == 1:
-        #     # Send response packet with data
-        #     serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), False, False, False, 1024, img[startByte:])
-        #     serverSocket.sendto(serverPacket.toByteArray(), address)
-
         else:
             # Close connection 1/4
-            print("closing connection?")
+            print("Closing connection")
             closePacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, NULL)
-            print("sending close")
             serverSocket.sendto(closePacket.toByteArray(), address)
 
 # Initialise and start server
