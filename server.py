@@ -84,7 +84,7 @@ class Server:
                 self.connection = True
 
                 # Read image to be sent as data in the packet
-                img = cv2.imread("image_black.png", cv2.IMREAD_GRAYSCALE)
+                img = cv2.imread("Rainbow.jpg", cv2.IMREAD_GRAYSCALE)
                 # dimensions = img.shape
                 # print(img.shape[0])
                 # sleep(1000)

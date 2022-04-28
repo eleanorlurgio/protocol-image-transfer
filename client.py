@@ -118,11 +118,20 @@ class Client:
 
 		if finBit == 1:
 			print("finbit acknowledged!")
+
+			# i = 0
+			fullImg = b''
+			for i in range(-1, len(img)):
+				fullImg = fullImg + img[i]
+				i += 1
+
+			# print(fullImg)
 			# print(img[0])
+			# print(img[1])
 			# Decodes data into a 1D array
-			decoded = numpy.frombuffer(img[0], dtype=numpy.uint8)
+			decoded = numpy.frombuffer(fullImg, dtype=numpy.uint8)
 			# # Reshapes the image to its original formation
-			decoded = decoded.reshape((8, 8, 1))
+			decoded = decoded.reshape((360, 360, 1))
 			# # Displays image in a window until closed
 			cv2.imshow('Image', decoded)
 			cv2.waitKey(0)
