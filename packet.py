@@ -44,7 +44,7 @@ class Packet:
         byteArray[12:16] = self.ackBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes for ackBit
         byteArray[16:20] = self.synBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes for synBit
         byteArray[20:24] = self.finBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes for finBit
-        if(type(self.data) is bytes):
-            byteArray[24:] = self.data   # Allocate the rest of the bytes to data
+        # if(type(self.data) is bytes):
+        byteArray[24:] = bytearray(self.data)   # Allocate the rest of the bytes to data
 
         return byteArray

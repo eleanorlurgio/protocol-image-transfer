@@ -11,10 +11,11 @@ import socket
 from time import sleep, time
 from cv2 import cv2
 from numpy import size
+import numpy
 import packet
 
 HEADER_SIZE = 24
-DATA_SIZE = 60
+DATA_SIZE = 200
 BUFFER_SIZE = HEADER_SIZE + DATA_SIZE
 
 
@@ -83,9 +84,19 @@ class Server:
                 self.connection = True
 
                 # Read image to be sent as data in the packet
-                img = cv2.imread("Rainbow.jpg", cv2.IMREAD_GRAYSCALE)
-                print("image type is", type(img))
-                noOfPackets = math.ceil(len(str(img).encode("utf-8")) / DATA_SIZE)
+                img = cv2.imread("image_black.png", cv2.IMREAD_GRAYSCALE)
+                # dimensions = img.shape
+                # print(img.shape[0])
+                # sleep(1000)
+
+                img = img.flatten()
+
+                # dimensions = img.shape
+                # print(img.shape[0])
+                # sleep(1000)
+
+                # print("image type is", type(img))
+                noOfPackets = math.ceil(len(img) / DATA_SIZE)
                 print("packet no is ", noOfPackets)
 
                 startByte = 0
@@ -103,7 +114,7 @@ class Server:
             if (ackBit == 1) and (self.connection == True):
                         # Close connection 1/4
                 print("acknowledgement received")
-                startByte += 60
+                startByte += DATA_SIZE
                 noOfPackets -= 1
                 self.sendImage(serverSocket, message, address, img, startByte, noOfPackets)
                 
@@ -122,12 +133,15 @@ class Server:
         # print(str(img).encode("utf-8"))
         # print(len(str(img).encode("utf-8")))
         # print(size(img[startByte:(startByte+60)]))
-        print(len(str(img).encode("utf-8")))
-        print(str(img)[180:240].encode("utf-8"))
+        # print(len(str(img).encode("utf-8")))
+        print(type(img))
+        # print(img.flatten())
+        print(img[startByte:(startByte+DATA_SIZE)])
+        # print(str(img)[180:240].encode("utf-8"))
 
-        if noOfPackets > 1:
+        if noOfPackets > 0:
             # Send response packet with data
-            serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), False, False, False, 1024, str(img)[startByte:(startByte+60)].encode("utf-8"))
+            serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), False, False, False, 1024, img[startByte:(startByte+DATA_SIZE)])
             serverSocket.sendto(serverPacket.toByteArray(), address)
 
         # elif noOfPackets == 1:
