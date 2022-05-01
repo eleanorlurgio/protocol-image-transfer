@@ -48,9 +48,6 @@ class Client:
 					continue
 				break
 
-			# Waiting
-			print('Waiting to receive')
-
 			# Receive packet from clientSock, show error message if nothing is received and continue listening
 			try:
 				serverPacket = clientSock.recvfrom(BUFFER_SIZE)
@@ -88,8 +85,6 @@ class Client:
 		print("Syn bit: " + str(synBit))
 		print("Fin bit: " + str(finBit))
 		print("Data: " + str(data))
-		# print("Data: ", len(data))
-		# print("Data: ", data.decode("utf-8"))
 
 		# Check bits of received packet to respond accordingly
 
@@ -105,7 +100,7 @@ class Client:
 
 		# Check if there is an image received
 		if data:
-			print("data received")
+			# print("data received")
 
 			img.append(data)
 
@@ -137,23 +132,16 @@ class Client:
 			print("Closing handshake 4/4 complete")
 			
 		
-		# Close socket
-		# print('closing socket')
-		#clientSock.close()
+		# Close socket and terminate
+		clientSock.close()
 
 	def endConnection(self, message, clientSock, UDP_IP_ADDRESS, UDP_PORT_NO):
-			# Send 2/4 closing packet
+			# Close connection 2/4
 			closePacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[24:25], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, False, 1024, NULL)
 			# self.clientSend(closePacket, (int.from_bytes(message[0:2], byteorder='big')))
 			clientSock.sendto(closePacket.toByteArray(), (UDP_IP_ADDRESS, UDP_PORT_NO))
-
-			try:
-				serverPacket = clientSock.recvfrom(BUFFER_SIZE)
-			except TimeoutError:
-				print("Timeout")
 			
-
-			# Send 3/4 closing packet
+			# Close connection 3/4
 			closePacket2 = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[24:25], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, NULL)
 			self.clientSend(closePacket2, (int.from_bytes(message[0:2], byteorder='big')))
 
