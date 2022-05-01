@@ -23,6 +23,7 @@ class Client:
 	def __init__(self, sourceIP, sourcePort):
 		self.sourceIP = sourceIP
 		self.sourcePort = sourcePort
+		self.closing = False
 
 	# Client listens and responds
 	def clientSend(self, packetToSend, destinationPort):
@@ -112,10 +113,10 @@ class Client:
 			self.clientSend(ackPacket, (int.from_bytes(message[0:2], byteorder='big')))
 
 
-		if finBit == 1:
+		if (finBit == 1) and (self.closing == False):
+			self.closing = True
 			print("Closing handshake 1/4 complete")
 
-			# i = 0
 			fullImg = b''
 			for i in range(-1, len(img)):
 				fullImg = fullImg + img[i]
@@ -129,10 +130,32 @@ class Client:
 			cv2.imshow('Image', decoded)
 			cv2.waitKey(0)
 
+			self.endConnection(message, clientSock, UDP_IP_ADDRESS, UDP_PORT_NO)
+
+
+		if (finBit == 1) and (self.closing == True):
+			print("Closing handshake 4/4 complete")
+			
+		
 		# Close socket
 		# print('closing socket')
 		#clientSock.close()
 
+	def endConnection(self, message, clientSock, UDP_IP_ADDRESS, UDP_PORT_NO):
+			# Send 2/4 closing packet
+			closePacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[24:25], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, False, 1024, NULL)
+			# self.clientSend(closePacket, (int.from_bytes(message[0:2], byteorder='big')))
+			clientSock.sendto(closePacket.toByteArray(), (UDP_IP_ADDRESS, UDP_PORT_NO))
+
+			try:
+				serverPacket = clientSock.recvfrom(BUFFER_SIZE)
+			except TimeoutError:
+				print("Timeout")
+			
+
+			# Send 3/4 closing packet
+			closePacket2 = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[24:25], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, NULL)
+			self.clientSend(closePacket2, (int.from_bytes(message[0:2], byteorder='big')))
 
 	def initialiseConnection(self):
 		# Create and send first packet

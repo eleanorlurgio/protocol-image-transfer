@@ -25,6 +25,7 @@ class Server:
         self.sourceIP = sourceIP
         self.sourcePort = sourcePort
         self.connection = False
+        self.closing = False
 
     # Server listens and responds
     def serverListen(self):
@@ -67,9 +68,10 @@ class Server:
             # Check bits of received packet to respond accordingly
 
             # HANDSHAKE TO CONNECT
+            print("ami i here")
 
             # Complete handshake 1/3
-            if synBit == 1:
+            if (synBit == 1) and (self.connection == False) and (self.closing == False):
                 print("Opening handshake 1/3 complete")
 
                 # Send response packet
@@ -77,10 +79,10 @@ class Server:
                 serverSocket.sendto(serverPacket.toByteArray(), address)
             
             # Complete handshake 3/3
-            if (ackBit == 1) and (self.connection == False):
+            if (ackBit == 1) and (self.connection == False) and (self.closing == False):
                 print("Opening handshake 3/3 complete")
                 print("CONNECTION ESTABLISHED")
-
+                # time.sleep(1000)
                 self.connection = True
 
                 # Read image to be sent as data in the packet
@@ -103,13 +105,24 @@ class Server:
                 self.sendImage(serverSocket, message, address, img, startByte, noOfPackets)
 
                 # SEND IMAGE
-            if (ackBit == 1) and (self.connection == True):
+            if (ackBit == 1) and (self.connection == True) and (self.closing == False):
                 # Acknowledgement packet received from client, so send next data packet
                 print("Acknowledgement packet received")
                 startByte += DATA_SIZE
                 noOfPackets -= 1
                 self.sendImage(serverSocket, message, address, img, startByte, noOfPackets)
+            
+            if (ackBit == 1) and (self.connection == True) and (self.closing == True):
+                # Send 3/4 closing handshake
+                print("Closing handshake 2/4 complete")
+                # closingPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, NULL)
+                # serverSocket.sendto(closingPacket.toByteArray(), address)
                 
+
+            if (ackBit == 1) and (finBit == 1) and (self.connection == True) and (self.closing == True):
+                print("Closing handshake 3/4 complete")
+                closingPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, NULL)
+                serverSocket.sendto(closingPacket.toByteArray(), address)
 
     def sendImage(self, serverSocket, message, address, img, startByte, noOfPackets):
 
@@ -120,8 +133,10 @@ class Server:
         else:
             # Close connection 1/4
             print("Closing connection")
+            self.closing = True
             closePacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, NULL)
             serverSocket.sendto(closePacket.toByteArray(), address)
+            
 
 # Initialise and start server
 server = Server('127.0.0.1', 8080)
