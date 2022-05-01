@@ -15,9 +15,10 @@ import numpy
 import packet
 
 HEADER_SIZE = 24
-DATA_SIZE = 200
+DATA_SIZE = 600
 BUFFER_SIZE = HEADER_SIZE + DATA_SIZE
 
+sys.setrecursionlimit(15000)
 
 class Server:
 
@@ -85,16 +86,13 @@ class Server:
                 self.connection = True
 
                 # Read image to be sent as data in the packet
-                img = cv2.imread("Rainbow.jpg", cv2.IMREAD_GRAYSCALE)
-                # dimensions = img.shape
-                # print(img.shape[0])
+                img = cv2.imread("Rainbow.jpg", cv2.IMREAD_COLOR)
+
+                # Check the shape of the image
+                print(img.shape[0], img.shape[1], img.shape[2])
                 # sleep(1000)
 
                 img = img.flatten()
-
-                # dimensions = img.shape
-                # print(img.shape[0])
-                # sleep(1000)
 
                 noOfPackets = math.ceil(len(img) / DATA_SIZE)
                 print("The number of data packets is", noOfPackets)

@@ -12,11 +12,12 @@ import numpy
 import packet
 
 HEADER_SIZE = 24
-DATA_SIZE = 200
+DATA_SIZE = 600
 BUFFER_SIZE = HEADER_SIZE + DATA_SIZE
 
-# img = []
 img = []
+
+sys.setrecursionlimit(15000)
 
 class Client:
 
@@ -120,7 +121,7 @@ class Client:
 			# Decodes data into a 1D array
 			decoded = numpy.frombuffer(fullImg, dtype=numpy.uint8)
 			# # Reshapes the image to its original formation
-			decoded = decoded.reshape((360, 360, 1))
+			decoded = decoded.reshape((360, 360, 3))
 			# # Displays image in a window until closed
 			cv2.imshow('Image', decoded)
 			cv2.waitKey(0)
