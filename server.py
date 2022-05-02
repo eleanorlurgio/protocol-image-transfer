@@ -137,7 +137,6 @@ class Server:
             self.closing = True
             closePacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, NULL)
             serverSocket.sendto(closePacket.toByteArray(), address)
-            
 
 # Initialise and start server
 server = Server('127.0.0.1', 8080)
