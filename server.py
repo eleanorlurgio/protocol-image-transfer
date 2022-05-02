@@ -90,7 +90,7 @@ class Server:
 
                 # Check the shape of the image
                 print(img.shape[0], img.shape[1], img.shape[2])
-                # sleep(1000)
+                sleep(1000)
 
                 img = img.flatten()
 
