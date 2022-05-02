@@ -15,7 +15,7 @@ import numpy
 import packet
 
 HEADER_SIZE = 24
-DATA_SIZE = 600
+DATA_SIZE = 1000
 BUFFER_SIZE = HEADER_SIZE + DATA_SIZE
 
 sys.setrecursionlimit(15000)
@@ -90,9 +90,11 @@ class Server:
 
                 # Check the shape of the image
                 print(img.shape[0], img.shape[1], img.shape[2])
-                sleep(1000)
+                # sleep(1000)
 
                 img = img.flatten()
+                # print(len(img))
+                # sleep(1000)
 
                 noOfPackets = math.ceil(len(img) / DATA_SIZE)
                 print("The number of data packets is", noOfPackets)
@@ -116,7 +118,7 @@ class Server:
             if (ackBit == 1) and (finBit == 1) and (self.connection == True) and (self.closing == True):
                 print("Closing handshake 3/4 complete")
                 # Close connection 4/4
-                closingPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, NULL)
+                closingPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, NULL)
                 serverSocket.sendto(closingPacket.toByteArray(), address)
 
                 # Close socket and terminate
@@ -127,13 +129,13 @@ class Server:
 
         if noOfPackets > 0:
             # Send response packet with data
-            serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), False, False, False, 1024, img[startByte:(startByte+DATA_SIZE)])
+            serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), 0, True, False, False, 1024, img[startByte:(startByte+DATA_SIZE)])
             serverSocket.sendto(serverPacket.toByteArray(), address)
         else:
             # Close connection 1/4
             print("Closing connection")
             self.closing = True
-            closePacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), random.randint(0, 2147483647), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, NULL)
+            closePacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, NULL)
             serverSocket.sendto(closePacket.toByteArray(), address)
             
 

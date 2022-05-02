@@ -15,7 +15,7 @@ import io
 # import PIL.Image as Image
 
 HEADER_SIZE = 24
-DATA_SIZE = 600
+DATA_SIZE = 1000
 BUFFER_SIZE = HEADER_SIZE + DATA_SIZE
 
 img = []
@@ -101,7 +101,7 @@ class Client:
 
 			img.append(data)
 
-			ackPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[24:25], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, False, 1024, NULL)
+			ackPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), 0, (seqNum + len(data)), True, False, False, 1024, NULL)
 			self.clientSend(ackPacket, clientSock, UDP_IP_ADDRESS, UDP_PORT_NO)
 
 
@@ -114,7 +114,7 @@ class Client:
 			# 	fullImg = fullImg + img[i]
 			# 	i += 1
 
-			# Decodes data into a 1D array
+			# # Decodes data into a 1D array
 			# decoded = numpy.frombuffer(fullImg, dtype=numpy.uint8)
 			# # # Reshapes the image to its original formation
 			# decoded = decoded.reshape((360, 360, 3))
@@ -122,11 +122,11 @@ class Client:
 			# cv2.imshow('Image', decoded)
 			# cv2.waitKey(0)
 
-			image = Image.frombytes("L", (3, 2), img)
+			# image = Image.frombytes("L", (3, 2), img)
 
-			# creating list 
-			img1 = list(img.getdata())
-			print(img1)
+			# # creating list 
+			# img1 = list(img.getdata())
+			# print(img1)
 			# def readimage(path):
 			# 	count = os.stat(path).st_size / 2
 			# 	with open(path, "rb") as f:
@@ -148,12 +148,12 @@ class Client:
 
 	def endConnection(self, message, clientSock, UDP_IP_ADDRESS, UDP_PORT_NO):
 			# Close connection 2/4
-			closePacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[24:25], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, False, 1024, NULL)
+			closePacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), int.from_bytes(message[4:8], byteorder='big'), True, False, False, 1024, NULL)
 			# self.clientSend(closePacket, (int.from_bytes(message[0:2], byteorder='big')))
 			clientSock.sendto(closePacket.toByteArray(), (UDP_IP_ADDRESS, UDP_PORT_NO))
 			
 			# Close connection 3/4
-			closePacket2 = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[24:25], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, NULL)
+			closePacket2 = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, NULL)
 			self.clientSend(closePacket2, clientSock, UDP_IP_ADDRESS, UDP_PORT_NO)
 
 	def initialiseConnection(self):
