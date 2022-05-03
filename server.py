@@ -2,6 +2,7 @@
 
 from asyncio.windows_events import NULL
 import math
+from msilib.schema import File
 import random
 from socket import *
 from email import message, message_from_bytes
@@ -86,15 +87,19 @@ class Server:
                 self.connection = True
 
                 # Read image to be sent as data in the packet
-                img = cv2.imread("Rainbow.jpg", cv2.IMREAD_COLOR)
+                # img = cv2.imread("Rainbow.jpg", cv2.IMREAD_COLOR)
 
-                # Check the shape of the image
-                print(img.shape[0], img.shape[1], img.shape[2])
-                # sleep(1000)
+                # # Check the shape of the image
+                # print(img.shape[0], img.shape[1], img.shape[2])
+                # # sleep(1000)
 
-                img = img.flatten()
+                # img = img.flatten()
                 # print(len(img))
                 # sleep(1000)
+
+                with open("Rainbow.jpg", "rb") as image:
+                    file = image.read()
+                    img = bytearray(file)
 
                 noOfPackets = math.ceil(len(img) / DATA_SIZE)
                 print("The number of data packets is", noOfPackets)

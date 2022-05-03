@@ -109,32 +109,15 @@ class Client:
 			self.closing = True
 			print("Closing handshake 1/4 complete")
 
-			# fullImg = b''
-			# for i in range(-1, len(img)):
-			# 	fullImg = fullImg + img[i]
-			# 	i += 1
+			fullImg = b''
+			for i in range(0, len(img)):
+				fullImg = fullImg + img[i]
 
-			# # Decodes data into a 1D array
-			# decoded = numpy.frombuffer(fullImg, dtype=numpy.uint8)
-			# # # Reshapes the image to its original formation
-			# decoded = decoded.reshape((360, 360, 3))
-			# # # Displays image in a window until closed
-			# cv2.imshow('Image', decoded)
-			# cv2.waitKey(0)
+			decoded = numpy.frombuffer(fullImg, dtype=numpy.uint8)
+			decoded = cv2.imdecode(decoded, flags=1)
 
-			# image = Image.frombytes("L", (3, 2), img)
-
-			# # creating list 
-			# img1 = list(img.getdata())
-			# print(img1)
-			# def readimage(path):
-			# 	count = os.stat(path).st_size / 2
-			# 	with open(path, "rb") as f:
-			# 		return bytearray(f.read())
-
-			# bytes = readimage(path+extension)
-			# image = Image.open(io.BytesIO(bytes))
-			# image.save(savepath)
+			cv2.imshow('Image', decoded)
+			cv2.waitKey(0)
 
 			self.endConnection(message, clientSock, UDP_IP_ADDRESS, UDP_PORT_NO)
 
