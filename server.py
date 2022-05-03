@@ -87,19 +87,12 @@ class Server:
                 self.connection = True
 
                 # Read image to be sent as data in the packet
-                # img = cv2.imread("Rainbow.jpg", cv2.IMREAD_COLOR)
-
-                # # Check the shape of the image
-                # print(img.shape[0], img.shape[1], img.shape[2])
-                # # sleep(1000)
-
-                # img = img.flatten()
-                # print(len(img))
-                # sleep(1000)
-
                 with open("Rainbow.jpg", "rb") as image:
                     file = image.read()
                     img = bytearray(file)
+
+                # print(len(img))
+                # sleep(1000)
 
                 noOfPackets = math.ceil(len(img) / DATA_SIZE)
                 print("The number of data packets is", noOfPackets)
@@ -134,7 +127,7 @@ class Server:
 
         if noOfPackets > 0:
             # Send response packet with data
-            serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), 0, True, False, False, 1024, img[startByte:(startByte+DATA_SIZE)])
+            serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), int.from_bytes(message[4:8], byteorder='big'), True, False, False, 1024, img[startByte:(startByte+DATA_SIZE)])
             serverSocket.sendto(serverPacket.toByteArray(), address)
         else:
             # Close connection 1/4

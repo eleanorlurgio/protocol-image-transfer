@@ -90,7 +90,7 @@ class Client:
 			print("Opening handshake 2/3 complete")
 
             # Send response packet
-			clientPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, False, 1024, NULL)
+			clientPacket = packet.Packet(self.sourcePort, sourcePort, ackNum, (seqNum + 1), True, False, False, 1024, NULL)
 			self.clientSend(clientPacket, clientSock, UDP_IP_ADDRESS, UDP_PORT_NO)
 
 		# RECEIVE IMAGE
@@ -101,7 +101,7 @@ class Client:
 
 			img.append(data)
 
-			ackPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), 0, (seqNum + len(data)), True, False, False, 1024, NULL)
+			ackPacket = packet.Packet(self.sourcePort, sourcePort, ackNum, (seqNum + len(data)), True, False, False, 1024, NULL)
 			self.clientSend(ackPacket, clientSock, UDP_IP_ADDRESS, UDP_PORT_NO)
 
 
