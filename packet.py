@@ -1,6 +1,10 @@
+import math
+from numpy import byte
+
+
 class Packet:
 
-    def __init__(self, sourcePort, destinationPort, seqNum, ackNum, ackBit, synBit, finBit,  windowSize, data):
+    def __init__(self, sourcePort, destinationPort, seqNum, ackNum, ackBit, synBit, finBit, data):
         self.sourcePort = int(sourcePort)
         self.destinationPort = int(destinationPort)
         self.seqNum = int(seqNum)
@@ -8,7 +12,7 @@ class Packet:
         self.ackBit = bool(ackBit)
         self.synBit = bool(synBit) 
         self.finBit = bool(finBit)       
-        self.windowSize = int(windowSize)   
+        self.checkSum = 0  
         self.data = data
 
     def setSeqNum(self):
@@ -44,7 +48,25 @@ class Packet:
         byteArray[12:16] = self.ackBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes for ackBit
         byteArray[16:20] = self.synBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes for synBit
         byteArray[20:24] = self.finBit.to_bytes(4, byteorder='big')   # Allocate 4 bytes for finBit
-        # if(type(self.data) is bytes):
-        byteArray[24:] = bytearray(self.data)   # Allocate the rest of the bytes to data
+        
+        self.checkSum = 0
+        byteArray[24:28] = self.checkSum.to_bytes(4, byteorder='big')
+        
+        byteArray[28:] = bytearray(self.data)   # Allocate bytes 28 onwards to data
+        
+        # Calculate checksum
+        self.checkSum = 0
+
+        for i in range (0, len(byteArray[0:24])):
+            # print(int.from_bytes(byteArray[i], byteorder='big'))
+            self.checkSum += byteArray[i]
+        # print(" header checksum is ", self.checkSum)
+        for i in range (0, len(byteArray[28:])):
+            # print(int.from_bytes(byteArray[i], byteorder='big'))
+            self.checkSum += byteArray[28+i]
+        # print(" header and data checksum is ", self.checkSum)
+        
+        byteArray[24:28] = self.checkSum.to_bytes(4, byteorder='big')   # Allocate 4 bytes for checkSum
+        # print(byteArray[24:28])
 
         return byteArray

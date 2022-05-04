@@ -15,7 +15,7 @@ from numpy import size
 import numpy
 import packet
 
-HEADER_SIZE = 24
+HEADER_SIZE = 28
 DATA_SIZE = 1000
 BUFFER_SIZE = HEADER_SIZE + DATA_SIZE
 
@@ -54,7 +54,23 @@ class Server:
             ackBit = int.from_bytes(message[12:16], byteorder='big')
             synBit = int.from_bytes(message[16:20], byteorder='big')
             finBit = int.from_bytes(message[20:24], byteorder='big')
-            data = int.from_bytes(message[24:], byteorder='big')
+            checkSum = int.from_bytes(message[24:28], byteorder='big')
+            data = int.from_bytes(message[28:], byteorder='big')
+
+            # Calculate checksum
+
+            validateCheckSum = 0
+
+            for i in range (0, len(message[0:24])):
+                validateCheckSum += message[i]
+
+            for i in range (0, len(message[28:])):
+                validateCheckSum += message[28+i]
+
+            print(checkSum)
+            print(validateCheckSum)
+            if (checkSum == validateCheckSum):
+                print("SUCCESS CHECKSUM")
 
             # Display packet contents in terminal
             print("\n* SERVER HAS RECEIVED *")
@@ -65,6 +81,7 @@ class Server:
             print("Ack bit: " + str(ackBit))
             print("Syn bit: " + str(synBit))
             print("Fin bit: " + str(finBit))
+            print("Checksum: " + str(checkSum))
             print("Data: " + str(data))
 
             # Check bits of received packet to respond accordingly
@@ -76,7 +93,7 @@ class Server:
                 print("Opening handshake 1/3 complete")
 
                 # Send response packet
-                serverPacket = packet.Packet(self.sourcePort, sourcePort, random.randint(0, 2147483647), (seqNum + 1), True, True, False, 1024, NULL)
+                serverPacket = packet.Packet(self.sourcePort, sourcePort, random.randint(0, 2147483647), (seqNum + 1), True, True, False, NULL)
                 serverSocket.sendto(serverPacket.toByteArray(), address)
             
             # Complete handshake 3/3
@@ -116,7 +133,7 @@ class Server:
             if (ackBit == 1) and (finBit == 1) and (self.connection == True) and (self.closing == True):
                 print("Closing handshake 3/4 complete")
                 # Close connection 4/4
-                closingPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, NULL)
+                closingPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, NULL)
                 serverSocket.sendto(closingPacket.toByteArray(), address)
 
                 # Close socket and terminate
@@ -127,13 +144,13 @@ class Server:
 
         if noOfPackets > 0:
             # Send response packet with data
-            serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), int.from_bytes(message[4:8], byteorder='big'), True, False, False, 1024, img[startByte:(startByte+DATA_SIZE)])
+            serverPacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), int.from_bytes(message[4:8], byteorder='big'), True, False, False, img[startByte:(startByte+DATA_SIZE)])
             serverSocket.sendto(serverPacket.toByteArray(), address)
         else:
             # Close connection 1/4
             print("Closing connection")
             self.closing = True
-            closePacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, NULL)
+            closePacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, NULL)
             serverSocket.sendto(closePacket.toByteArray(), address)
 
 # Initialise and start server

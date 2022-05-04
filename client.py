@@ -14,7 +14,7 @@ import os
 import io
 # import PIL.Image as Image
 
-HEADER_SIZE = 24
+HEADER_SIZE = 28
 DATA_SIZE = 1000
 BUFFER_SIZE = HEADER_SIZE + DATA_SIZE
 
@@ -70,7 +70,24 @@ class Client:
 		ackBit = int.from_bytes(message[12:16], byteorder='big')
 		synBit = int.from_bytes(message[16:20], byteorder='big')
 		finBit = int.from_bytes(message[20:24], byteorder='big')
-		data = message[24:]
+		checkSum = int.from_bytes(message[24:28], byteorder='big')
+		data = message[28:]
+
+		print(type(data))
+		# Calculate checksum
+
+		validateCheckSum = 0
+
+		for i in range (0, len(message[0:24])):
+			validateCheckSum += message[i]
+
+		for i in range (0, len(message[28:])):
+			validateCheckSum += message[28+i]
+
+		print(checkSum)
+		print(validateCheckSum)
+		if (checkSum == validateCheckSum):
+			print("SUCCESS CHECKSUM")
 
 		# Display packet contents in terminal
 		print("\n* CLIENT HAS RECEIVED *")
@@ -81,6 +98,7 @@ class Client:
 		print("Ack bit: " + str(ackBit))
 		print("Syn bit: " + str(synBit))
 		print("Fin bit: " + str(finBit))
+		print("Checksum: " + str(checkSum))
 		print("Data: " + str(data))
 
 		# Check bits of received packet to respond accordingly
@@ -90,7 +108,7 @@ class Client:
 			print("Opening handshake 2/3 complete")
 
             # Send response packet
-			clientPacket = packet.Packet(self.sourcePort, sourcePort, ackNum, (seqNum + 1), True, False, False, 1024, NULL)
+			clientPacket = packet.Packet(self.sourcePort, sourcePort, ackNum, (seqNum + 1), True, False, False, NULL)
 			self.clientSend(clientPacket, clientSock, UDP_IP_ADDRESS, UDP_PORT_NO)
 
 		# RECEIVE IMAGE
@@ -101,7 +119,7 @@ class Client:
 
 			img.append(data)
 
-			ackPacket = packet.Packet(self.sourcePort, sourcePort, ackNum, (seqNum + len(data)), True, False, False, 1024, NULL)
+			ackPacket = packet.Packet(self.sourcePort, sourcePort, ackNum, (seqNum + len(data)), True, False, False, NULL)
 			self.clientSend(ackPacket, clientSock, UDP_IP_ADDRESS, UDP_PORT_NO)
 
 
@@ -113,9 +131,11 @@ class Client:
 			for i in range(0, len(img)):
 				fullImg = fullImg + img[i]
 
+			# print(fullImg)
 			decoded = numpy.frombuffer(fullImg, dtype=numpy.uint8)
+			# print(decoded)
 			decoded = cv2.imdecode(decoded, flags=1)
-
+			# print(decoded)
 			cv2.imshow('Image', decoded)
 			cv2.waitKey(0)
 
@@ -131,17 +151,17 @@ class Client:
 
 	def endConnection(self, message, clientSock, UDP_IP_ADDRESS, UDP_PORT_NO):
 			# Close connection 2/4
-			closePacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), int.from_bytes(message[4:8], byteorder='big'), True, False, False, 1024, NULL)
+			closePacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), int.from_bytes(message[4:8], byteorder='big'), True, False, False, NULL)
 			# self.clientSend(closePacket, (int.from_bytes(message[0:2], byteorder='big')))
 			clientSock.sendto(closePacket.toByteArray(), (UDP_IP_ADDRESS, UDP_PORT_NO))
 			
 			# Close connection 3/4
-			closePacket2 = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, 1024, NULL)
+			closePacket2 = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, NULL)
 			self.clientSend(closePacket2, clientSock, UDP_IP_ADDRESS, UDP_PORT_NO)
 
 	def initialiseConnection(self):
 		# Create and send first packet
-		clientPacket = packet.Packet(self.sourcePort, 8080, random.randint(0, 2147483647), 0, False, True, False, 1024, NULL)
+		clientPacket = packet.Packet(self.sourcePort, 8080, random.randint(0, 2147483647), 0, False, True, False, NULL)
 		
 				# Define IP address and port number to send to (both client and server on the same IP address)
 		UDP_IP_ADDRESS = self.sourceIP
