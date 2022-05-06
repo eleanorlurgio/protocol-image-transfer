@@ -57,6 +57,9 @@ class Packet:
         # Calculate checksum
         self.checkSum = 0
 
+        # if self.data:
+        #     self.checkSum -=128
+
         for i in range (0, len(byteArray[0:24])):
             # print(int.from_bytes(byteArray[i], byteorder='big'))
             self.checkSum += byteArray[i]

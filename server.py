@@ -16,7 +16,7 @@ import numpy
 import packet
 
 HEADER_SIZE = 28
-DATA_SIZE = 1000
+DATA_SIZE = 996
 BUFFER_SIZE = HEADER_SIZE + DATA_SIZE
 
 sys.setrecursionlimit(15000)
@@ -67,10 +67,9 @@ class Server:
             for i in range (0, len(message[28:])):
                 validateCheckSum += message[28+i]
 
-            print(checkSum)
-            print(validateCheckSum)
-            if (checkSum == validateCheckSum):
-                print("SUCCESS CHECKSUM")
+            # print(checkSum)
+            # print(validateCheckSum)
+
 
             # Display packet contents in terminal
             print("\n* SERVER HAS RECEIVED *")
@@ -83,7 +82,8 @@ class Server:
             print("Fin bit: " + str(finBit))
             print("Checksum: " + str(checkSum))
             print("Data: " + str(data))
-
+            if (checkSum == validateCheckSum):
+                print("SUCCESSFUL CHECKSUM")
             # Check bits of received packet to respond accordingly
 
             # HANDSHAKE TO CONNECT
@@ -104,12 +104,13 @@ class Server:
                 self.connection = True
 
                 # Read image to be sent as data in the packet
+                #with open("Rainbow.jpg", "rb") as image:
                 with open("Rainbow.jpg", "rb") as image:
                     file = image.read()
                     img = bytearray(file)
 
                 # print(len(img))
-                # sleep(1000)
+                # sleep(10000)
 
                 noOfPackets = math.ceil(len(img) / DATA_SIZE)
                 print("The number of data packets is", noOfPackets)
@@ -119,7 +120,7 @@ class Server:
                 self.sendImage(serverSocket, message, address, img, startByte, noOfPackets)
 
                 # SEND IMAGE
-            if (ackBit == 1) and (self.connection == True) and (self.closing == False):
+            elif (ackBit == 1) and (self.connection == True) and (self.closing == False):
                 # Acknowledgement packet received from client, so send next data packet
                 print("Acknowledgement packet received")
                 startByte += DATA_SIZE
@@ -153,6 +154,6 @@ class Server:
             closePacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), (int.from_bytes(message[4:8], byteorder='big') + 1), True, False, True, NULL)
             serverSocket.sendto(closePacket.toByteArray(), address)
 
-# Initialise and start server
-server = Server('127.0.0.1', 8080)
+# Initialise and start server10.77.115.66
+server = Server('0.0.0.0', 8080)
 server.serverListen()

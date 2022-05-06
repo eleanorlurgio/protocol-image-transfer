@@ -15,7 +15,7 @@ import io
 # import PIL.Image as Image
 
 HEADER_SIZE = 28
-DATA_SIZE = 1000
+DATA_SIZE = 996
 BUFFER_SIZE = HEADER_SIZE + DATA_SIZE
 
 img = []
@@ -73,7 +73,6 @@ class Client:
 		checkSum = int.from_bytes(message[24:28], byteorder='big')
 		data = message[28:]
 
-		print(type(data))
 		# Calculate checksum
 
 		validateCheckSum = 0
@@ -84,10 +83,8 @@ class Client:
 		for i in range (0, len(message[28:])):
 			validateCheckSum += message[28+i]
 
-		print(checkSum)
-		print(validateCheckSum)
-		if (checkSum == validateCheckSum):
-			print("SUCCESS CHECKSUM")
+		# print(checkSum)
+		# print(validateCheckSum)
 
 		# Display packet contents in terminal
 		print("\n* CLIENT HAS RECEIVED *")
@@ -100,6 +97,8 @@ class Client:
 		print("Fin bit: " + str(finBit))
 		print("Checksum: " + str(checkSum))
 		print("Data: " + str(data))
+		if (checkSum == validateCheckSum):
+			print("SUCCESSFUL CHECKSUM")
 
 		# Check bits of received packet to respond accordingly
 
@@ -116,7 +115,7 @@ class Client:
 		# Check if there is an image received
 		if data:
 			# print("data received")
-
+			# sleep(10000)
 			img.append(data)
 
 			ackPacket = packet.Packet(self.sourcePort, sourcePort, ackNum, (seqNum + len(data)), True, False, False, NULL)
@@ -131,13 +130,13 @@ class Client:
 			for i in range(0, len(img)):
 				fullImg = fullImg + img[i]
 
-			# print(fullImg)
-			decoded = numpy.frombuffer(fullImg, dtype=numpy.uint8)
-			# print(decoded)
-			decoded = cv2.imdecode(decoded, flags=1)
-			# print(decoded)
-			cv2.imshow('Image', decoded)
-			cv2.waitKey(0)
+			try:
+				decoded = numpy.frombuffer(fullImg, dtype=numpy.uint8)
+				decoded = cv2.imdecode(decoded, flags=1)
+				cv2.imshow('Image', decoded)
+				cv2.waitKey(0)
+			except:
+				print("No image found")
 
 			self.endConnection(message, clientSock, UDP_IP_ADDRESS, UDP_PORT_NO)
 
