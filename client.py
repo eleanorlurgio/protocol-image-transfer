@@ -12,7 +12,6 @@ import numpy
 import packet
 import os
 import io
-# import PIL.Image as Image
 
 HEADER_SIZE = 28
 DATA_SIZE = 996
@@ -32,12 +31,11 @@ class Client:
 	# Client listens and responds
 	def clientSend(self, packetToSend, clientSock, UDP_IP_ADDRESS, UDP_PORT_NO):
 
-		# Send packet as bytearray
-
 		# Client listens continuously
 		while True:
 			while True:
 				try:
+					# Send packet as bytearray
 					clientSock.sendto(packetToSend.toByteArray(), (UDP_IP_ADDRESS, UDP_PORT_NO))
 				except ConnectionResetError:
 					print("Server not up")
@@ -74,7 +72,6 @@ class Client:
 		data = message[28:]
 
 		# Calculate checksum
-
 		validateCheckSum = 0
 
 		for i in range (0, len(message[0:24])):
@@ -82,9 +79,6 @@ class Client:
 
 		for i in range (0, len(message[28:])):
 			validateCheckSum += message[28+i]
-
-		# print(checkSum)
-		# print(validateCheckSum)
 
 		# Display packet contents in terminal
 		print("\n* CLIENT HAS RECEIVED *")
@@ -110,18 +104,16 @@ class Client:
 			clientPacket = packet.Packet(self.sourcePort, sourcePort, ackNum, (seqNum + 1), True, False, False, NULL)
 			self.clientSend(clientPacket, clientSock, UDP_IP_ADDRESS, UDP_PORT_NO)
 
-		# RECEIVE IMAGE
-
 		# Check if there is an image received
 		if data:
-			# print("data received")
-			# sleep(10000)
+			# Add image data to the end of the full image list of bytes
 			img.append(data)
 
+			# Send ack packet back
 			ackPacket = packet.Packet(self.sourcePort, sourcePort, ackNum, (seqNum + len(data)), True, False, False, NULL)
 			self.clientSend(ackPacket, clientSock, UDP_IP_ADDRESS, UDP_PORT_NO)
 
-
+		# Close connection
 		if (finBit == 1) and (self.closing == False):
 			self.closing = True
 			print("Closing handshake 1/4 complete")
@@ -130,6 +122,7 @@ class Client:
 			for i in range(0, len(img)):
 				fullImg = fullImg + img[i]
 
+			# Display the image in window
 			try:
 				decoded = numpy.frombuffer(fullImg, dtype=numpy.uint8)
 				decoded = cv2.imdecode(decoded, flags=1)
@@ -151,7 +144,6 @@ class Client:
 	def endConnection(self, message, clientSock, UDP_IP_ADDRESS, UDP_PORT_NO):
 			# Close connection 2/4
 			closePacket = packet.Packet(self.sourcePort, int.from_bytes(message[0:2], byteorder='big'), int.from_bytes(message[8:12], byteorder='big'), int.from_bytes(message[4:8], byteorder='big'), True, False, False, NULL)
-			# self.clientSend(closePacket, (int.from_bytes(message[0:2], byteorder='big')))
 			clientSock.sendto(closePacket.toByteArray(), (UDP_IP_ADDRESS, UDP_PORT_NO))
 			
 			# Close connection 3/4
@@ -162,7 +154,7 @@ class Client:
 		# Create and send first packet
 		clientPacket = packet.Packet(self.sourcePort, 8080, random.randint(0, 2147483647), 0, False, True, False, NULL)
 		
-				# Define IP address and port number to send to (both client and server on the same IP address)
+		# Define IP address and port number to send to (both client and server on the same IP address)
 		UDP_IP_ADDRESS = self.sourceIP
 		UDP_PORT_NO = 8080
 
@@ -181,8 +173,6 @@ class Client:
 
 		# Create client instance
 		client = Client(IP, port)
-
-		
 
 		# Start 3 way handshake procedure
 		client.initialiseConnection()

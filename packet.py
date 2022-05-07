@@ -57,19 +57,12 @@ class Packet:
         # Calculate checksum
         self.checkSum = 0
 
-        # if self.data:
-        #     self.checkSum -=128
-
         for i in range (0, len(byteArray[0:24])):
-            # print(int.from_bytes(byteArray[i], byteorder='big'))
             self.checkSum += byteArray[i]
-        # print(" header checksum is ", self.checkSum)
+
         for i in range (0, len(byteArray[28:])):
-            # print(int.from_bytes(byteArray[i], byteorder='big'))
             self.checkSum += byteArray[28+i]
-        # print(" header and data checksum is ", self.checkSum)
         
         byteArray[24:28] = self.checkSum.to_bytes(4, byteorder='big')   # Allocate 4 bytes for checkSum
-        # print(byteArray[24:28])
 
         return byteArray
